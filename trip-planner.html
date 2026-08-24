@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旅行行程規劃</title>
+<style>
+  :root{
+    --ink:#23201b; --ink-soft:#6b6559; --line:#d9d2c4; --line-soft:#eae4d7;
+    --paper:#f7f3ea; --panel:#fffdf8; --accent:#3a6b5f; --accent-soft:#e4efe9;
+    --green:#dff0d8; --green-b:#2f7d32; --red:#f7dcd8; --red-b:#b23a2e;
+    --yellow:#fbf1c7;
+    --hover:#f0eadc;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Noto Sans TC","Yu Gothic",system-ui,sans-serif;
+    font-size:14px; line-height:1.5;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:20px 16px 80px}
+
+  /* header */
+  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+  header h1{
+    font-family:"Yu Mincho","Noto Serif TC",serif; font-weight:600;
+    font-size:26px; letter-spacing:.06em; margin:0;
+  }
+  header h1 .en{font-size:12px;letter-spacing:.24em;color:var(--ink-soft);display:block;font-weight:400;font-family:system-ui}
+  .tripname{
+    flex:1;min-width:180px;border:none;background:transparent;
+    font-family:"Yu Mincho","Noto Serif TC",serif;font-size:20px;color:var(--ink);
+    border-bottom:1px dashed var(--line);padding:2px 4px;
+  }
+  .tripname:focus{outline:none;border-bottom-color:var(--accent)}
+
+  .ver{font-size:11px;color:var(--ink-soft);letter-spacing:.1em;border:1px solid var(--line);
+    border-radius:20px;padding:2px 9px;background:var(--panel);align-self:center;font-family:system-ui}
+
+  /* library */
+  #library{padding-top:22px}
+  .lib-sub{color:var(--ink-soft);font-size:13px;margin:0 2px 18px}
+  .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .card{
+    border:1px solid var(--line);border-radius:10px;background:var(--panel);
+    padding:16px 15px;cursor:pointer;position:relative;transition:box-shadow .12s,transform .12s;
+    min-height:104px;display:flex;flex-direction:column;
+  }
+  .card:hover{box-shadow:0 4px 14px rgba(60,50,30,.1);transform:translateY(-1px)}
+  .card .cname{font-family:"Yu Mincho","Noto Serif TC",serif;font-size:17px;color:var(--ink);
+    letter-spacing:.04em;margin-bottom:6px;word-break:break-word;line-height:1.35}
+  .card .cmeta{font-size:12px;color:var(--ink-soft);margin-top:auto}
+  .card .cacts{position:absolute;top:9px;right:9px;display:flex;gap:4px;opacity:0;transition:opacity .12s}
+  .card:hover .cacts{opacity:1}
+  .card .cacts button{border:1px solid var(--line);background:var(--paper);border-radius:6px;
+    width:26px;height:26px;cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--ink-soft)}
+  .card .cacts .edit:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .card .cacts .dup:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .card .cacts .del:hover{background:var(--red-b);color:#fff;border-color:var(--red-b)}
+  .card.add{align-items:center;justify-content:center;border-style:dashed;color:var(--accent);
+    font-size:14px;letter-spacing:.05em;background:transparent}
+  .card.add:hover{background:var(--accent-soft);box-shadow:none;transform:none}
+  .card.add .plus{font-size:26px;line-height:1;margin-bottom:4px}
+  .lib-tools{margin-top:22px}
+
+  /* namebar */
+  .namebar{margin:16px 0 2px}
+  .tripname-edit{width:100%;border:none;background:transparent;
+    font-family:"Yu Mincho","Noto Serif TC",serif;font-size:22px;color:var(--ink);
+    border-bottom:1px dashed var(--line);padding:4px 4px 6px;}
+  .tripname-edit:focus{outline:none;border-bottom-color:var(--accent)}
+
+  .backbtn{border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);
+    padding:7px 13px;border-radius:6px;cursor:pointer;font-size:12.5px;align-self:center;margin-right:4px}
+  .backbtn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .toolbtn.save{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  .toolbtn.save:hover{background:#2c554b}
+  .toolbtn.save.dirty{animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(58,107,95,.5)}50%{box-shadow:0 0 0 5px rgba(58,107,95,0)}}
+
+  /* tabs */
+  nav{display:flex;gap:2px;margin:16px 0 0;border-bottom:2px solid var(--ink);
+    position:sticky;top:0;z-index:20;background:var(--paper);padding-top:8px;flex-wrap:wrap;row-gap:4px}
+  .tab{
+    border:1px solid var(--line);border-bottom:none;background:var(--panel);
+    padding:8px 18px;cursor:pointer;font-size:13px;letter-spacing:.05em;
+    color:var(--ink-soft);border-radius:6px 6px 0 0;position:relative;top:1px;
+  }
+  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
+  .tab:not(.active):hover{background:var(--hover)}
+  .spacer{flex:1}
+  .toolbtn{
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);
+    padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12.5px;margin-left:6px;
+    align-self:center;
+  }
+  .toolbtn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .toolbtn.ghost:hover{background:var(--red-b);border-color:var(--red-b)}
+
+  .view{display:none;padding-top:20px}
+  .view.active{display:block}
+
+  /* ---- Itinerary ---- */
+  .day{margin-bottom:26px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+  .day-head{
+    display:flex;align-items:center;gap:12px;background:var(--accent-soft);
+    padding:8px 12px;border-bottom:1px solid var(--line);
+  }
+  .day-badge{
+    font-family:"Yu Mincho",serif;font-weight:600;color:var(--accent);
+    font-size:15px;letter-spacing:.08em;white-space:nowrap;
+  }
+  .day-date{border:none;background:transparent;font-size:13px;color:var(--ink-soft);width:150px}
+  .day-date:focus{outline:none}
+  .date-wrap{position:relative;display:inline-flex}
+  .date-btn{border:1px solid var(--line);background:#fffef9;border-radius:5px;padding:4px 10px;
+    font-size:13px;color:var(--accent);cursor:pointer;font-family:system-ui;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .date-btn:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .date-btn.empty{color:var(--ink-soft);border-style:dashed}
+  .date-hidden{position:absolute;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none}
+  .hotel{
+    flex:1;border:1px dashed var(--line);background:#fffef9;border-radius:5px;
+    padding:5px 9px;font-size:13px;color:var(--ink);
+  }
+  .hotel::placeholder{color:#b8b0a0}
+  .hotel:focus{outline:none;border-color:var(--accent);border-style:solid}
+  .hotel-wrap{flex:1;display:flex;align-items:center;gap:4px}
+  .hotel-wrap .hotel{flex:1}
+  .hotelmap{margin:0;flex:0 0 auto}
+  .day-x{margin-left:auto;border:none;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:15px;padding:2px 6px;border-radius:4px}
+  .day-x:hover{background:var(--red);color:var(--red-b)}
+
+  /* grid rows */
+  .rows{padding:6px}
+  .row{
+    display:grid;grid-template-columns:20px 96px 1fr 1.1fr;gap:0;
+    border:1px solid var(--line-soft);border-radius:6px;margin:5px 0;background:#fff;
+    position:relative;transition:box-shadow .12s;
+  }
+  .row.c4{grid-template-columns:20px 96px 1fr 1.1fr .9fr}
+  .row.dragging{opacity:.4}
+  .row.over{box-shadow:inset 0 3px 0 -1px var(--accent)}
+  .row.over-below{box-shadow:inset 0 -3px 0 -1px var(--accent)}
+  .row.st-green{background:var(--green)}
+  .row.st-red{background:var(--red)}
+  .row.st-bred{background:var(--yellow)}
+  .row.st-bred .cell.col-place textarea,
+  .row.st-bred .cell.col-note textarea{font-weight:700;color:var(--red-b)}
+
+  .grip{
+    display:flex;align-items:center;justify-content:center;cursor:grab;
+    color:#c3bbaa;font-size:13px;user-select:none;border-right:1px solid var(--line-soft);
+  }
+  .grip:active{cursor:grabbing}
+  .cell{border-right:1px solid var(--line-soft);position:relative}
+  .cell:last-child{border-right:none}
+  .cell textarea{
+    width:100%;border:none;background:transparent;resize:none;overflow:hidden;
+    font-family:inherit;font-size:13.5px;color:inherit;padding:8px 9px;line-height:1.45;
+    display:block;min-height:34px;
+  }
+  .cell textarea:focus{outline:2px solid var(--accent);outline-offset:-2px;background:#fffef7;border-radius:4px}
+  .cell.col-time textarea{color:var(--accent);font-variant-numeric:tabular-nums}
+  .cell.col-time{display:flex;flex-direction:column}
+
+  .col-place{display:flex;flex-direction:column}
+  .col-note{display:flex;flex-direction:column}
+  .place-top{display:flex;align-items:flex-start}
+  .place-top textarea{flex:1}
+  .expand{
+    border:none;background:transparent;cursor:pointer;color:#b0a892;font-size:11px;
+    padding:8px 6px;line-height:1;align-self:stretch;
+  }
+  .expand:hover{color:var(--accent)}
+  .mapicon{
+    border:1px solid var(--line);background:var(--panel);cursor:pointer;color:var(--accent);
+    width:24px;height:24px;border-radius:5px;padding:0;margin:6px 2px 0 0;
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  }
+  .mapicon:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .mapicon:disabled{color:#c8c1b2;border-color:var(--line-soft);background:transparent;cursor:default}
+  .note{
+    display:none;border-top:1px dashed var(--line-soft);padding:0;
+  }
+  .note.open{display:block}
+  .note textarea{
+    font-size:12.5px;color:var(--ink-soft);min-height:52px;background:#fbf9f3;
+    font-style:italic;
+  }
+  .maplink{
+    border:none;background:transparent;cursor:pointer;color:var(--accent);
+    font-size:11px;padding:4px 8px;text-align:left;text-decoration:underline;
+    text-underline-offset:2px;opacity:.75;
+  }
+  .maplink:hover{opacity:1}
+  .maplink:disabled{color:#c3bbaa;text-decoration:none;cursor:default;opacity:.5}
+
+  .row-tools{
+    position:absolute;right:4px;top:-11px;display:none;gap:3px;z-index:2;
+  }
+  .row:hover .row-tools{display:flex}
+  .mini{
+    border:1px solid var(--line);background:var(--panel);border-radius:5px;
+    width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;padding:0;
+    display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+  }
+  .mini:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .mini.color{font-size:14px}
+
+  .addrow{
+    width:100%;border:1px dashed var(--line);background:transparent;color:var(--ink-soft);
+    padding:7px;border-radius:6px;cursor:pointer;font-size:12.5px;margin-top:2px;
+  }
+  .addrow:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+  .addday{
+    display:block;margin:0 auto;border:1px solid var(--accent);color:var(--accent);
+    background:var(--panel);padding:9px 26px;border-radius:8px;cursor:pointer;font-size:13.5px;letter-spacing:.05em;
+  }
+  .addday:hover{background:var(--accent);color:#fff}
+
+  /* legend */
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin:6px 2px 18px;align-items:center}
+  .legend b{color:var(--ink)}
+  .chip{display:inline-block;width:26px;height:14px;border-radius:3px;vertical-align:middle;margin-right:5px;border:1px solid var(--line)}
+  .chip.g{background:var(--green)} .chip.r{background:var(--red)} .chip.y{background:var(--yellow)}
+
+  /* ---- To Buy / To Do lists ---- */
+  .listwrap{max-width:640px}
+  .listhead{font-family:"Yu Mincho",serif;font-size:18px;letter-spacing:.06em;margin:0 0 4px;color:var(--accent)}
+  .listsub{color:var(--ink-soft);font-size:12.5px;margin:0 0 16px}
+  .litem{
+    display:flex;align-items:flex-start;gap:10px;background:var(--panel);
+    border:1px solid var(--line-soft);border-radius:7px;padding:8px 10px;margin:6px 0;
+  }
+  .litem.done{opacity:.55}
+  .litem.done .ltext textarea{text-decoration:line-through;color:var(--ink-soft)}
+  .litem input[type=checkbox]{margin-top:4px;width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex:0 0 auto}
+  .ltext{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+  .ltext-top{display:flex;align-items:flex-start;gap:8px}
+  .ltext-top textarea{flex:1}
+  .ltext textarea{border:none;background:transparent;resize:none;overflow:hidden;font-family:inherit;font-size:13.5px;color:var(--ink);min-height:22px;padding:2px}
+  .ltext textarea:focus{outline:none;background:#fffef7;border-radius:4px}
+  .litem .del{border:none;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;flex:0 0 auto}
+  .litem .del:hover{background:var(--red);color:var(--red-b)}
+  /* multi-image gallery */
+  .gallery{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+  .gcell{position:relative;width:58px;height:58px}
+  .gcell img{width:58px;height:58px;object-fit:cover;border-radius:6px;border:1px solid var(--line);cursor:pointer;background:#f0eadc}
+  .gdel{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;border:none;
+    background:var(--red-b);color:#fff;font-size:10px;line-height:1;cursor:pointer;padding:0;display:none}
+  .gcell:hover .gdel{display:block}
+  .gadd{width:58px;height:58px;border:1px dashed var(--line);border-radius:6px;color:#b8b0a0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:1px;background:#fffef9}
+  .gadd:hover,.gadd:focus{border-color:var(--accent);color:var(--accent);outline:none;background:var(--accent-soft)}
+  .gadd span{font-size:18px;line-height:1}
+  .gadd small{font-size:9px}
+  .gfull{width:58px;height:58px;border:1px solid var(--line-soft);border-radius:6px;color:#b8b0a0;
+    display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center}
+
+  .imgview{position:fixed;inset:0;background:rgba(20,18,14,.82);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out}
+  .imgview.open{display:flex}
+  .imgview img{max-width:86vw;max-height:88vh;border-radius:8px;cursor:default}
+  .iv-nav{position:absolute;top:50%;transform:translateY(-50%);border:none;cursor:pointer;
+    background:rgba(255,255,255,.14);color:#fff;font-size:30px;line-height:1;width:52px;height:72px;
+    border-radius:10px;display:flex;align-items:center;justify-content:center}
+  .iv-nav:hover{background:rgba(255,255,255,.28)}
+  .iv-prev{left:14px} .iv-next{right:14px}
+  .iv-count{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;
+    font-size:13px;background:rgba(0,0,0,.4);padding:4px 12px;border-radius:20px;letter-spacing:.1em}
+  .gcell{cursor:grab}
+  .gcell.gdragging{opacity:.4}
+  .gcell.gover{box-shadow:0 0 0 2px var(--accent);border-radius:6px}
+
+  footer{text-align:center;color:#b8b0a0;font-size:11px;margin-top:30px;letter-spacing:.05em}
+
+  /* ---- meals ---- */
+  .meals-layout{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+  .meal-summary{background:var(--accent-soft);border:1px solid var(--line);border-radius:8px;
+    padding:10px 14px;font-size:13px;color:var(--ink);margin-bottom:16px;line-height:1.7}
+  .meal-summary b{color:var(--accent)}
+  .meal-summary .warn{color:var(--red-b);font-weight:600}
+
+  /* horizontal meal grid: columns = days, rows = 早/午/晚 */
+  .meals-main{overflow-x:auto}
+  .meal-grid{display:grid;gap:4px;min-width:min-content}
+  .meal-corner{}
+  .meal-col-head{background:var(--accent-soft);border:1px solid var(--line);border-radius:6px;
+    padding:6px 8px;text-align:center}
+  .meal-col-head .mh-day{font-family:"Yu Mincho",serif;font-weight:600;color:var(--accent);font-size:13px}
+  .meal-col-head .mh-date{font-size:11px;color:var(--ink-soft);margin-top:1px}
+  .meal-rowlabel{display:flex;align-items:center;justify-content:center;
+    font-family:"Yu Mincho",serif;font-size:15px;color:var(--ink-soft);font-weight:600}
+  .mcell{position:relative;border:1px solid var(--line-soft);border-radius:6px;background:#fff;
+    min-height:84px;display:flex;flex-direction:column;padding-top:18px}
+  .mcell.m-green{background:var(--green)}
+  .mcell.m-red{background:var(--red)}
+  .mcell.m-yellow{background:var(--yellow)}
+  .mcell.m-yellow .mcell-in{font-weight:700;color:var(--red-b)}
+  .mcell.m-lock{background:#ece8df}
+  .mcell.m-lock .mcell-in{color:var(--ink-soft)}
+  .mcell.mover{box-shadow:0 0 0 2px var(--accent)}
+  .mcell.mdragging{opacity:.4}
+  .mcell.mdeleted{background:repeating-linear-gradient(45deg,#f0ece3,#f0ece3 6px,#e9e4d8 6px,#e9e4d8 12px);
+    border-style:dashed;align-items:center;justify-content:center;padding-top:0}
+  .mcell-grip{position:absolute;top:2px;right:4px;font-size:10px;color:#bdb5a4;cursor:grab;user-select:none;line-height:1}
+  .mcell-grip:active{cursor:grabbing}
+  .mcell-status{position:absolute;top:2px;left:4px;border:none;background:transparent;cursor:pointer;
+    font-size:11px;padding:0;line-height:1}
+  .mcell-lock{position:absolute;top:2px;left:22px;border:none;background:transparent;cursor:pointer;
+    font-size:11px;padding:0;line-height:1;opacity:.7}
+  .mcell-lock:hover,.mcell-lock.on{opacity:1}
+  .mcell-in{flex:1;width:100%;border:none;background:transparent;resize:none;overflow:hidden;
+    font-family:inherit;font-size:13px;color:var(--ink);padding:2px 7px 7px;line-height:1.4;min-height:20px}
+  .mcell-in:focus{outline:2px solid var(--accent);outline-offset:-2px;background:#fffef7;border-radius:4px}
+  .mcell-add{border:1px solid var(--line);background:rgba(255,255,255,.7);color:var(--ink-soft);
+    border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;line-height:1;padding:0}
+  .mcell-add:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  /* add-row bar in itinerary */
+  .row-addbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:2px}
+  .row-addbar .addrow{flex:1;margin-top:0;min-width:120px}
+  .addmeal{border:1px dashed var(--line);background:transparent;color:var(--ink-soft);
+    padding:7px 11px;border-radius:6px;cursor:pointer;font-size:12.5px;white-space:nowrap}
+  .addmeal:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .grip.locked{cursor:not-allowed;color:var(--ink-soft)}
+
+  .wishlist{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:14px 14px 16px;position:sticky;top:12px}
+  .wl-head{font-family:"Yu Mincho",serif;font-size:16px;color:var(--accent);margin:0 0 4px;letter-spacing:.06em}
+  .wl-sub{font-size:11.5px;color:var(--ink-soft);margin:0 0 12px;line-height:1.5}
+  .wl-hint{font-size:12px;color:var(--accent);margin:6px 0 0;min-height:0}
+  .witem{display:flex;align-items:flex-start;gap:6px;border:1px solid var(--line-soft);border-radius:7px;
+    padding:7px 8px;margin:6px 0;background:#fff;transition:box-shadow .1s}
+  .witem:hover{box-shadow:0 0 0 1.5px var(--accent-soft)}
+  .witem.picked{opacity:.5;background:var(--green)}
+  .witem.picked .wtext textarea{text-decoration:line-through}
+  .witem.mdragging{opacity:.4}
+  .wgrip{cursor:grab;color:#c3bbaa;font-size:12px;padding-top:3px;user-select:none}
+  .wgrip:active{cursor:grabbing}
+  .wtext{flex:1;display:flex;flex-direction:column}
+  .wtext textarea{border:none;background:transparent;resize:none;overflow:hidden;font-family:inherit;
+    font-size:13px;color:var(--ink);min-height:20px;padding:1px}
+  .wtext textarea:focus{outline:none;background:#fffef7;border-radius:4px}
+  .witem .wundo,.witem .wdel{border:none;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:13px;padding:1px 3px;border-radius:4px}
+  .witem .wundo:hover{background:var(--accent-soft);color:var(--accent)}
+  .witem .wdel:hover{background:var(--red);color:var(--red-b)}
+  .mchip{display:inline-block;vertical-align:middle;margin-right:4px}
+  .mchip.g,.mchip.r{width:26px;height:14px;border-radius:3px;border:1px solid var(--line)}
+  .mchip.g{background:var(--green)} .mchip.r{background:var(--red)}
+  .mchip.lock{border:none;width:auto}
+
+  /* meal tag in itinerary rows */
+  .meal-tag{text-align:center;font-family:"Yu Mincho",serif;font-size:11px;font-weight:600;
+    color:var(--accent);background:var(--accent-soft);border-radius:4px;margin:4px 4px 0;padding:1px 0}
+  .row.mealrow.m-green{background:var(--green)}
+  .row.mealrow.m-red{background:var(--red)}
+  .row.mealrow.m-lock{background:#ece8df}
+  .row.mealrow.m-yellow{background:var(--yellow)}
+  .row.mealrow.m-yellow .cell.col-place textarea,
+  .row.mealrow.m-yellow .cell.col-note textarea{font-weight:700;color:var(--red-b)}
+  .lockbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  /* day collapse */
+  .day-caret{border:none;background:transparent;cursor:pointer;color:var(--accent);font-size:14px;
+    padding:0 4px;line-height:1}
+  .day-caret:hover{color:var(--ink)}
+  .day-preview{font-size:12px;color:var(--ink-soft);margin-left:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+  .day.collapsed .day-head{border-bottom:none}
+
+  footer{margin-top:30px}
+
+  @media(max-width:640px){
+    .row,.row.c4{grid-template-columns:18px 70px 1fr}
+    .row .cell.col-note{grid-column:2/-1;border-right:none;border-top:1px solid var(--line-soft)}
+    .row.c4 .cell.col-extra{grid-column:2/-1;border-top:1px solid var(--line-soft)}
+    header h1{font-size:22px}
+    .tab{padding:8px 12px}
+    .meals-layout{grid-template-columns:1fr}
+    .wishlist{position:static}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>行程<span class="en">TRIP PLANNER</span></h1>
+    <span class="ver" id="verBadge">v2.4</span>
+  </header>
+
+  <!-- ===== LIBRARY (overview) ===== -->
+  <section id="library">
+    <p class="lib-sub">選一個行程繼續編輯，或新增一個。資料自動存在這個瀏覽器，下次打開就在。</p>
+    <div class="lib-grid" id="libGrid"></div>
+    <div class="lib-tools">
+      <button class="toolbtn" id="btnImport2">從 HTML 檔匯入</button>
+    </div>
+  </section>
+
+  <!-- ===== EDITOR ===== -->
+  <section id="editor" style="display:none">
+  <nav>
+    <button class="backbtn" id="btnBack" title="回行程總覽">‹ 總覽</button>
+    <div class="tab active" data-view="itin">行程</div>
+    <div class="tab" data-view="meals">三餐</div>
+    <div class="tab" data-view="buy">To Buy 手信</div>
+    <div class="tab" data-view="todo">To Do</div>
+    <div class="spacer"></div>
+    <button class="toolbtn save" id="btnSave">儲存</button>
+    <button class="toolbtn" id="btnExportImg">匯出圖片</button>
+    <button class="toolbtn" id="btnExport">匯出 HTML</button>
+    <input type="file" id="fileInput" accept=".html" hidden>
+  </nav>
+
+  <div class="namebar">
+    <input class="tripname-edit" id="tripNameEdit" placeholder="旅程名稱（例：東京 5 日）">
+  </div>
+
+  <!-- ITINERARY -->
+  <section class="view active" id="view-itin">
+    <div class="legend">
+      <span><span class="chip g"></span>綠 = 已決定</span>
+      <span><span class="chip r"></span>紅 = 未定 / 要改</span>
+      <span><span class="chip y"></span><b style="color:var(--red-b)">黃底粗體紅</b> = 當地或前一日才做</span>
+      <span style="margin-left:auto">點左側 ◑ 切換顏色 · 拖 ⠿ 調位置</span>
+    </div>
+    <div id="days"></div>
+    <button class="addday" id="btnAddDay">＋ 新增一天</button>
+  </section>
+
+  <!-- MEALS -->
+  <section class="view" id="view-meals">
+    <div class="meals-layout">
+      <div class="meals-main">
+        <div class="legend">
+          <span><span class="mchip lock">🔒</span>鎖定 = 旅館含餐 / 已訂，不能改</span>
+          <span><span class="mchip g"></span>綠 = 已決定</span>
+          <span><span class="mchip r"></span>紅 = 未定，待配對</span>
+        </div>
+        <div class="meal-summary" id="mealSummary"></div>
+        <div id="mealsDays"></div>
+      </div>
+      <aside class="wishlist">
+        <h3 class="wl-head">想食清單</h3>
+        <p class="wl-sub">列你想食嘅。用 ⠿ 把項目拖去左邊某餐格填入；拖去另一格會搬走。用咗會變灰保留紀錄。三餐同「行程」頁即時同步。</p>
+        <div id="wishList"></div>
+        <button class="addrow" id="btnAddWish">＋ 加想食</button>
+        <p class="wl-hint" id="wlHint"></p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- TO BUY -->
+  <section class="view" id="view-buy">
+    <div class="listwrap">
+      <h2 class="listhead">To Buy 手信</h2>
+      <p class="listsub">要買的手信、伴手禮。先打字，再點圖片格「＋」貼圖（Ctrl/⌘+V）或選檔，每項最多 10 張，方便把同款不同店的選擇擺一起。點圖可放大。</p>
+      <div id="buyList"></div>
+      <button class="addrow" id="btnAddBuy">＋ 加一項</button>
+    </div>
+  </section>
+
+  <!-- TO DO -->
+  <section class="view" id="view-todo">
+    <div class="listwrap">
+      <h2 class="listhead">To Do</h2>
+      <p class="listsub">要查、要訂、要辦的事。勾選 = 完成。</p>
+      <div id="todoList"></div>
+      <button class="addrow" id="btnAddTodo">＋ 加一項</button>
+    </div>
+  </section>
+
+  <footer>資料自動存在瀏覽器 · 「儲存」寫回這個行程 · 「匯出 HTML」給電腦手機轉移</footer>
+  </section>
+</div>
+
+<div class="imgview" id="imgView">
+  <button class="iv-nav iv-prev" id="ivPrev" title="上一張">‹</button>
+  <img id="imgViewImg" alt="">
+  <button class="iv-nav iv-next" id="ivNext" title="下一張">›</button>
+  <div class="iv-count" id="ivCount"></div>
+</div>
+
+<script>
+/* ============ version ============ */
+const APP_VERSION = "2.4";
+const STORE_KEY = "tripPlannerTrips";
+document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
+
+/* ============ state ============ */
+const STATUS = ["", "st-green", "st-red", "st-bred"]; // cycle order
+const MEAL_STATUS = ["m-red","m-green","m-yellow"];   // cycle: 未定→已決定→黃底粗紅（鎖定為獨立掣）
+const MEAL_ICON = {"m-red":"🔴","m-green":"🟢","m-yellow":"🟡"};
+const MEAL_SLOTS = [["b","早"],["l","午"],["d","晚"]];
+let state = null;        // current trip being edited
+let currentId = null;    // id of trip in library (null = not yet saved)
+let dirty = false;
+let pickedWish = null;    // index of wish item selected for assigning
+
+function uid(){ return 't'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function blankRow(){ return {time:"",place:"",note:"",extra:null,detail:"",detailOpen:false,addr:"",status:"",meal:null,mealStatus:"m-red",mealLock:false,link:"",linkOpen:false}; }
+function mealRow(slot){ const r=blankRow(); r.meal=slot; return r; }
+const MEAL_ORDER={b:0,l:1,d:2};
+function hasMeal(day,slot){ return day.rows.some(r=>r.meal===slot); }
+function addMealSlot(day,slot){
+  if(hasMeal(day,slot)) return;
+  const r=mealRow(slot);
+  // insert so meal rows stay in b/l/d order, before the first non-meal row
+  let idx=0;
+  for(let i=0;i<day.rows.length;i++){
+    const rr=day.rows[i];
+    if(rr.meal && MEAL_ORDER[rr.meal] < MEAL_ORDER[slot]) idx=i+1;
+    else if(rr.meal && MEAL_ORDER[rr.meal] > MEAL_ORDER[slot]){ idx=i; break; }
+    else if(!rr.meal){ break; }
+    else idx=i+1;
+  }
+  day.rows.splice(idx,0,r);
+}
+function blankDay(){ return {date:"",hotel:"",collapsed:false,rows:[mealRow('b'),mealRow('l'),mealRow('d')]}; }
+function blankState(){ return { name:"", days:[blankDay()], buy:[], todo:[], wish:[] }; }
+
+/* migrate older saved trips so new fields exist */
+function migrate(d){
+  if(!d) return blankState();
+  if(!Array.isArray(d.wish)) d.wish=[];
+  if(Array.isArray(d.buy)) d.buy.forEach(b=>{
+    if(!Array.isArray(b.imgs)) b.imgs = b.img ? [b.img] : [];
+    delete b.img;
+  });
+  (d.days||[]).forEach(day=>{
+    if(day.date===undefined) day.date="";
+    if(day.collapsed===undefined) day.collapsed=false;
+    if(!Array.isArray(day.rows)) day.rows=[];
+    day.rows.forEach(r=>{ if(r.meal===undefined)r.meal=null; if(r.mealStatus===undefined)r.mealStatus="m-red"; if(r.link===undefined)r.link=""; if(r.linkOpen===undefined)r.linkOpen=false;
+      if(r.mealLock===undefined) r.mealLock=false;
+      if(r.mealStatus==='m-lock'){ r.mealLock=true; r.mealStatus='m-green'; } // legacy lock → separate flag
+    });
+    // convert legacy day.meals object into meal rows if present
+    if(day.meals){
+      const have=new Set(day.rows.filter(r=>r.meal).map(r=>r.meal));
+      [['b'],['l'],['d']].forEach(([k])=>{
+        if(!have.has(k)){
+          const src=day.meals[k]||{};
+          const r=mealRow(k); r.place=src.text||''; r.mealStatus=src.status||'m-red';
+          day.rows.unshift(r);
+        }
+      });
+      const order={b:0,l:1,d:2};
+      const meals=day.rows.filter(r=>r.meal).sort((a,b)=>order[a.meal]-order[b.meal]);
+      const rest=day.rows.filter(r=>!r.meal);
+      day.rows=[...meals,...rest];
+      delete day.meals;
+    }
+    // NOTE: we intentionally do NOT force-add missing meal slots here —
+    // a missing slot means the user deleted that meal (e.g. breakfast eaten before flight).
+  });
+  return d;
+}
+
+/* ---- trip library in localStorage ---- */
+function loadTrips(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY))||[]; }catch(e){ return []; } }
+function saveTrips(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
+
+function markDirty(){ if(!dirty){ dirty=true; document.getElementById('btnSave').classList.add('dirty'); } }
+function clearDirty(){ dirty=false; document.getElementById('btnSave').classList.remove('dirty'); }
+
+/* ============ render: itinerary ============ */
+const daysEl = document.getElementById('days');
+
+function autosize(t){
+  t.style.height='auto';
+  const h=t.scrollHeight;
+  // scrollHeight is 0 when the element is in a hidden tab; fall back to line count
+  if(h>0){ t.style.height=h+'px'; }
+  else {
+    const lines=(t.value.match(/\n/g)||[]).length+1;
+    t.style.height=(lines*20+14)+'px';
+  }
+}
+function autosizeAll(){ document.querySelectorAll('#editor textarea').forEach(autosize); }
+
+function render(){
+  daysEl.innerHTML='';
+  state.days.forEach((day,di)=>{
+    const d=document.createElement('div'); d.className='day'+(day.collapsed?' collapsed':'');
+    const head=document.createElement('div'); head.className='day-head';
+    const caret=document.createElement('button'); caret.className='day-caret'; caret.textContent=day.collapsed?'▸':'▾'; caret.title=day.collapsed?'展開':'收起';
+    caret.onclick=()=>{ day.collapsed=!day.collapsed; render(); };
+    const badge=document.createElement('span'); badge.className='day-badge'; badge.textContent='Day '+(di+1);
+    const date=dateField(day,di);
+    const hotelWrap=document.createElement('div'); hotelWrap.className='hotel-wrap';
+    const hotel=inp('hotel',day.hotel,'🏨 今晚住宿…',v=>{day.hotel=v; hmap.disabled=!v.trim();});
+    const hmap=document.createElement('button'); hmap.className='mapicon hotelmap'; hmap.title='在 Google Maps 搜尋住宿';
+    hmap.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+    hmap.disabled=!(day.hotel&&day.hotel.trim());
+    hmap.onclick=()=>{ const q=(day.hotel||'').trim(); if(q) window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank'); };
+    hotelWrap.append(hotel,hmap);
+    const del=document.createElement('button'); del.className='day-x'; del.textContent='✕'; del.title='刪除這天';
+    del.onclick=()=>{ if(confirm('刪除 Day '+(di+1)+'？')){ state.days.splice(di,1); if(!state.days.length)state.days.push(blankDay()); render(); renderMeals(); } };
+    head.append(caret,badge,date,hotelWrap,del);
+    // collapsed preview: show the day's meals inline
+    if(day.collapsed){
+      const prev=document.createElement('span'); prev.className='day-preview';
+      const ms=day.rows.filter(r=>r.meal&&r.place.trim()).map(r=>r.place.trim());
+      prev.textContent = ms.length? '🍴 '+ms.join(' · ') : '';
+      head.appendChild(prev);
+    }
+    d.appendChild(head);
+
+    if(!day.collapsed){
+      const rows=document.createElement('div'); rows.className='rows';
+      day.rows.forEach((r,ri)=> rows.appendChild(rowEl(day,di,r,ri)) );
+      const bar=document.createElement('div'); bar.className='row-addbar';
+      const add=document.createElement('button'); add.className='addrow'; add.textContent='＋ 加一行';
+      add.onclick=()=>{ day.rows.push(blankRow()); render(); };
+      bar.appendChild(add);
+      // add-back buttons for any deleted meal slots
+      [['b','早餐'],['l','午餐'],['d','晚餐']].forEach(([slot,name])=>{
+        if(!hasMeal(day,slot)){
+          const b=document.createElement('button'); b.className='addmeal'; b.textContent='＋'+name;
+          b.title='加回'+name+'（三餐頁同步恢復）';
+          b.onclick=()=>{ addMealSlot(day,slot); render(); renderMeals(); };
+          bar.appendChild(b);
+        }
+      });
+      rows.appendChild(bar);
+      d.appendChild(rows);
+    }
+    daysEl.appendChild(d);
+  });
+  daysEl.querySelectorAll('textarea').forEach(autosize);
+}
+
+/* ---- date helpers ---- */
+const WEEK=["日","一","二","三","四","五","六"];
+function fmtDate(iso){
+  if(!iso) return "";
+  const p=iso.split('-'); if(p.length<3) return iso;
+  const dt=new Date(+p[0],+p[1]-1,+p[2]);
+  if(isNaN(dt)) return iso;
+  return (+p[1])+'/'+(+p[2])+'（'+WEEK[dt.getDay()]+'）';
+}
+function addDays(iso,n){
+  const p=iso.split('-'); const dt=new Date(+p[0],+p[1]-1,+p[2]); dt.setDate(dt.getDate()+n);
+  const mm=String(dt.getMonth()+1).padStart(2,'0'), dd=String(dt.getDate()).padStart(2,'0');
+  return dt.getFullYear()+'-'+mm+'-'+dd;
+}
+function dateField(day,di){
+  const wrap=document.createElement('span'); wrap.className='date-wrap';
+  const btn=document.createElement('button'); btn.className='date-btn';
+  btn.textContent = day.date ? fmtDate(day.date) : '＋ 選日期';
+  if(!day.date) btn.classList.add('empty');
+  const picker=document.createElement('input'); picker.type='date'; picker.className='date-hidden'; picker.value=day.date||'';
+  btn.onclick=()=>{ if(picker.showPicker) picker.showPicker(); else picker.click(); };
+  picker.onchange=()=>{
+    day.date=picker.value;
+    // cascade: set following days that are empty or were sequential
+    for(let k=di+1;k<state.days.length;k++){ state.days[k].date=addDays(state.days[k-1].date||day.date,1); }
+    render(); renderMeals(); markDirty();
+  };
+  wrap.append(btn,picker);
+  return wrap;
+}
+
+function inp(cls,val,ph,on){
+  const e=document.createElement('input'); e.className=cls; e.value=val||''; e.placeholder=ph;
+  e.oninput=()=>on(e.value); return e;
+}
+function ta(val,ph,on){
+  const t=document.createElement('textarea'); t.value=val||''; t.placeholder=ph||'';
+  t.rows=1; t.oninput=()=>{on(t.value);autosize(t)}; return t;
+}
+
+function rowEl(day,di,r,ri){
+  const isMeal=!!r.meal;
+  const row=document.createElement('div');
+  // itinerary: locked meals keep their status colour (only 三餐頁 greys out)
+  const statusCls = isMeal ? (r.mealStatus||'m-red') : (r.status||'');
+  row.className='row '+(isMeal?'mealrow ':'')+statusCls+(r.extra!==null?' c4':'')+(isMeal&&r.mealLock?' locked-meal':'');
+  row.draggable=false;
+
+  const grip=document.createElement('div'); grip.className='grip'; grip.textContent='⠿';
+  row.appendChild(grip);
+
+  // time (meal rows show 早/午/晚 tag above the time field)
+  const cTime=document.createElement('div'); cTime.className='cell col-time';
+  if(isMeal){
+    const tag=document.createElement('div'); tag.className='meal-tag';
+    tag.textContent={b:'早',l:'午',d:'晚'}[r.meal];
+    cTime.appendChild(tag);
+  }
+  cTime.appendChild(ta(r.time,'時間',v=>r.time=v));
+  row.appendChild(cTime);
+
+  // place (+ expand + note + maplink)
+  const cPlace=document.createElement('div'); cPlace.className='cell col-place';
+  const top=document.createElement('div'); top.className='place-top';
+  top.appendChild(ta(r.place, isMeal?'餐廳 / 想食…':'景點 / 活動', v=>{ r.place=v; if(isMeal) renderMeals(); }));
+  // maps icon (top-right of place cell) — opens addr, else place name
+  const mbtn=document.createElement('button'); mbtn.className='mapicon'; mbtn.title='在 Google Maps 開啟';
+  mbtn.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  const syncMap=()=>{ mbtn.disabled=!(r.addr&&r.addr.trim()); };
+  mbtn.onclick=()=>{ const q=(r.addr||'').trim(); if(q) window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank'); };
+  const exp=document.createElement('button'); exp.className='expand'; exp.textContent=r.detailOpen?'▲':'▼'; exp.title='展開詳細備註';
+  const note=document.createElement('div'); note.className='note'+(r.detailOpen?' open':'');
+  const nt=ta(r.detail,'詳細備註…（展開輸入）',v=>r.detail=v); note.appendChild(nt);
+  const addr=document.createElement('input'); addr.className='hotel'; addr.style.margin='0 8px 8px'; addr.style.width='calc(100% - 16px)';
+  addr.placeholder='📍 地址 / 地點名（填了才可開 Google Maps）'; addr.value=r.addr||'';
+  addr.oninput=()=>{r.addr=addr.value; syncMap();};
+  note.append(addr);
+  exp.onclick=()=>{ r.detailOpen=!r.detailOpen; note.classList.toggle('open'); exp.textContent=r.detailOpen?'▲':'▼'; if(r.detailOpen)autosize(nt); };
+  top.append(mbtn,exp);
+  syncMap();
+  cPlace.append(top,note);
+  row.appendChild(cPlace);
+
+  // note/transport col (with hyperlink support)
+  const cNote=document.createElement('div'); cNote.className='cell col-note';
+  const ntop=document.createElement('div'); ntop.className='place-top';
+  ntop.appendChild(ta(r.note,'備註 / 交通（幾點到幾點）',v=>r.note=v));
+  const normLink=(u)=>{ u=(u||'').trim(); if(!u) return ''; return /^https?:\/\//i.test(u)?u:'https://'+u; };
+  const lbtn=document.createElement('button'); lbtn.className='mapicon linkicon'; lbtn.title='開啟連結（Klook / KKday 等）';
+  lbtn.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+  const syncLink=()=>{ lbtn.disabled=!normLink(r.link); };
+  lbtn.onclick=()=>{ const u=normLink(r.link); if(u) window.open(u,'_blank'); };
+  const lexp=document.createElement('button'); lexp.className='expand'; lexp.textContent=r.linkOpen?'▲':'🔗'; lexp.title='貼上超連結';
+  const lnote=document.createElement('div'); lnote.className='note'+(r.linkOpen?' open':'');
+  const linput=document.createElement('input'); linput.className='hotel'; linput.style.margin='8px'; linput.style.width='calc(100% - 16px)';
+  linput.placeholder='🔗 貼上超連結（Klook / KKday / 官網訂位…）'; linput.value=r.link||'';
+  linput.oninput=()=>{ r.link=linput.value; syncLink(); };
+  lnote.append(linput);
+  lexp.onclick=()=>{ r.linkOpen=!r.linkOpen; lnote.classList.toggle('open'); lexp.textContent=r.linkOpen?'▲':'🔗'; };
+  ntop.append(lbtn,lexp);
+  syncLink();
+  cNote.append(ntop,lnote);
+  row.appendChild(cNote);
+
+  // optional 4th col
+  if(r.extra!==null){
+    const cEx=document.createElement('div'); cEx.className='cell col-extra';
+    cEx.appendChild(ta(r.extra,'第四欄',v=>r.extra=v));
+    row.appendChild(cEx);
+  }
+
+  // row tools
+  const tools=document.createElement('div'); tools.className='row-tools';
+  const color=document.createElement('button'); color.className='mini color';
+  color.innerHTML = isMeal ? MEAL_ICON[r.mealStatus||'m-red'] : '◑';
+  color.title=isMeal?'切換：未定→已決定→黃底粗紅':'切換顏色';
+  color.onclick=()=>{
+    if(isMeal){ const i=MEAL_STATUS.indexOf(r.mealStatus||'m-red'); r.mealStatus=MEAL_STATUS[(i+1)%MEAL_STATUS.length]; render(); renderMeals(); }
+    else { const i=STATUS.indexOf(r.status||''); r.status=STATUS[(i+1)%STATUS.length]; render(); }
+  };
+  tools.append(color);
+  if(isMeal){
+    const lock=document.createElement('button'); lock.className='mini lockbtn'+(r.mealLock?' on':'');
+    lock.textContent=r.mealLock?'🔒':'🔓'; lock.title=r.mealLock?'已鎖定，點一下解鎖':'鎖定此餐（旅館含餐/已訂）';
+    lock.onclick=()=>{ r.mealLock=!r.mealLock; render(); renderMeals(); };
+    tools.append(lock);
+  }
+  const col4=document.createElement('button'); col4.className='mini'; col4.textContent=r.extra!==null?'−4':'+4'; col4.title=r.extra!==null?'移除第四欄':'加第四欄';
+  col4.onclick=()=>{ r.extra=(r.extra!==null)?null:''; render(); };
+  tools.append(col4);
+  const dup=document.createElement('button'); dup.className='mini'; dup.textContent='⧉'; dup.title='複製此行（貼在下面）';
+  dup.onclick=()=>{ const copy=JSON.parse(JSON.stringify(r)); copy.meal=null; copy.mealStatus='m-red'; copy.mealLock=false; day.rows.splice(ri+1,0,copy); render(); if(isMeal)renderMeals(); markDirty(); };
+  tools.append(dup);
+  const rm=document.createElement('button'); rm.className='mini'; rm.textContent='✕';
+  rm.title=isMeal?'刪除此餐（之後可加回）':'刪除此行';
+  const rowHasContent=()=> (r.time||'').trim()||(r.place||'').trim()||(r.note||'').trim()||(r.detail||'').trim()||(r.addr||'').trim()||(r.link||'').trim()||(r.extra||'').trim();
+  rm.onclick=()=>{
+    if(rowHasContent()){
+      const label=(r.place||'').trim()|| (isMeal?({b:'早餐',l:'午餐',d:'晚餐'}[r.meal]):'這一行');
+      if(!confirm('「'+label+'」有輸入內容，確定刪除？')) return;
+    }
+    day.rows.splice(ri,1); render(); if(isMeal) renderMeals(); markDirty();
+  };
+  tools.append(rm);
+  row.appendChild(tools);
+
+  // drag reorder — only when holding the grip; locked meals can't be dragged
+  const locked = isMeal && r.mealLock;
+  if(locked){ grip.classList.add('locked'); grip.textContent='🔒'; grip.title='已鎖定，不能移動'; }
+  grip.addEventListener('mousedown',()=>{ if(!locked) row.draggable=true; });
+  grip.addEventListener('touchstart',()=>{ if(!locked) row.draggable=true; },{passive:true});
+  document.addEventListener('mouseup',()=>{ row.draggable=false; });
+  row.addEventListener('dragstart',e=>{ if(locked){e.preventDefault();return;} dragSrc={di,ri}; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+  row.addEventListener('dragend',()=>{ row.draggable=false; row.classList.remove('dragging'); document.querySelectorAll('.row.over,.row.over-below').forEach(x=>{x.classList.remove('over');x.classList.remove('over-below');}); });
+  row.addEventListener('dragover',e=>{ e.preventDefault();
+    const rect=row.getBoundingClientRect(); const below = e.clientY > rect.top+rect.height/2;
+    row.classList.toggle('over', !below); row.classList.toggle('over-below', below);
+  });
+  row.addEventListener('dragleave',()=>{ row.classList.remove('over'); row.classList.remove('over-below'); });
+  row.addEventListener('drop',e=>{
+    e.preventDefault();
+    const rect=row.getBoundingClientRect(); const below = e.clientY > rect.top+rect.height/2;
+    row.classList.remove('over'); row.classList.remove('over-below');
+    if(!dragSrc) return;
+    const from=dragSrc.ri;
+    const arr=state.days[dragSrc.di].rows;
+    const src=arr.splice(from,1)[0];
+    // compute insert index in this day's rows
+    let target=ri + (below?1:0);
+    if(dragSrc.di===di && from<ri) target--; // account for the removed item shifting indices
+    if(target<0) target=0; if(target>state.days[di].rows.length) target=state.days[di].rows.length;
+    state.days[di].rows.splice(target,0,src);
+    dragSrc=null; render(); renderMeals();
+  });
+
+  return row;
+}
+let dragSrc=null;
+
+/* ============ lists: buy / todo ============ */
+let imgDrag=null; // {it, from}
+function renderList(arr,elId,withImg){
+  const box=document.getElementById(elId); box.innerHTML='';
+  // display order: not-done first, done sink to bottom (stable)
+  const order=arr.map((it,idx)=>({it,idx})).sort((a,b)=>(a.it.done?1:0)-(b.it.done?1:0) || a.idx-b.idx);
+  order.forEach(({it})=>{
+    const li=document.createElement('div'); li.className='litem'+(it.done?' done':'')+(withImg?' litem-buy':'');
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!it.done;
+    cb.onchange=()=>{it.done=cb.checked; renderList(arr,elId,withImg); markDirty();};
+
+    const txt=document.createElement('div'); txt.className='ltext';
+    const topline=document.createElement('div'); topline.className='ltext-top';
+    topline.appendChild(cb);
+    topline.appendChild(ta(it.text,'項目…',v=>it.text=v));
+    const del=document.createElement('button'); del.className='del'; del.textContent='✕';
+    del.onclick=()=>{ const k=arr.indexOf(it); if(k>=0)arr.splice(k,1); renderList(arr,elId,withImg); markDirty(); };
+    topline.appendChild(del);
+    txt.appendChild(topline);
+    txt.appendChild(ta(it.sub,withImg?'在哪買 / 備註…':'備註…',v=>it.sub=v));
+
+    if(withImg){
+      if(!Array.isArray(it.imgs)) it.imgs=[];
+      const gal=document.createElement('div'); gal.className='gallery';
+      it.imgs.forEach((src,gi)=>{
+        const cell=document.createElement('div'); cell.className='gcell'; cell.draggable=true;
+        const im=document.createElement('img'); im.src=src; im.title='點擊放大 · 可拖拉調位置';
+        im.onclick=()=>openImg(it.imgs,gi);
+        const x=document.createElement('button'); x.className='gdel'; x.textContent='✕'; x.title='移除這張圖';
+        x.onclick=(e)=>{ e.stopPropagation(); it.imgs.splice(gi,1); renderList(arr,elId,withImg); markDirty(); };
+        cell.append(im,x);
+        // drag reorder within this item's gallery
+        cell.addEventListener('dragstart',e=>{ imgDrag={it,from:gi}; cell.classList.add('gdragging'); e.dataTransfer.effectAllowed='move'; });
+        cell.addEventListener('dragend',()=>{ cell.classList.remove('gdragging'); gal.querySelectorAll('.gover').forEach(x=>x.classList.remove('gover')); });
+        cell.addEventListener('dragover',e=>{ if(imgDrag&&imgDrag.it===it){ e.preventDefault(); cell.classList.add('gover'); } });
+        cell.addEventListener('dragleave',()=>cell.classList.remove('gover'));
+        cell.addEventListener('drop',e=>{ e.preventDefault(); cell.classList.remove('gover');
+          if(!imgDrag||imgDrag.it!==it) return;
+          const moved=it.imgs.splice(imgDrag.from,1)[0];
+          let t=gi; if(imgDrag.from<gi) t--;
+          it.imgs.splice(t,0,moved); imgDrag=null; renderList(arr,elId,withImg); markDirty();
+        });
+        gal.appendChild(cell);
+      });
+      if(it.imgs.length<10){
+        const add=document.createElement('div'); add.className='gadd'; add.tabIndex=0;
+        add.innerHTML='<span>＋</span><small>貼圖/選檔</small>';
+        add.title='點一下選檔，或先點這裡再 Ctrl/⌘+V 貼上圖片（最多 10 張）';
+        add.onclick=()=>pickImgs(it,arr,elId,withImg);
+        add.addEventListener('paste',ev=>handlePaste(ev,it,arr,elId,withImg));
+        gal.appendChild(add);
+      } else {
+        const full=document.createElement('div'); full.className='gfull'; full.textContent='已滿 10 張';
+        gal.appendChild(full);
+      }
+      txt.appendChild(gal);
+    }
+
+    li.appendChild(txt);
+    box.appendChild(li);
+  });
+  box.querySelectorAll('textarea').forEach(autosize);
+}
+function addImgsToItem(it,files,arr,elId,withImg){
+  const room=10-it.imgs.length;
+  const take=Array.from(files).slice(0,Math.max(0,room));
+  let pending=take.length; if(!pending){ if(files.length) alert('每項最多 10 張圖片。'); return; }
+  take.forEach(f=>fileToImg(f,data=>{ it.imgs.push(data); if(--pending===0){ renderList(arr,elId,withImg); markDirty(); } }));
+}
+function pickImgs(it,arr,elId,withImg){
+  const f=document.createElement('input'); f.type='file'; f.accept='image/*'; f.multiple=true;
+  f.onchange=()=>{ if(f.files.length) addImgsToItem(it,f.files,arr,elId,withImg); };
+  f.click();
+}
+function fileToImg(file,cb){ const rd=new FileReader(); rd.onload=()=>cb(rd.result); rd.readAsDataURL(file); }
+function clipboardImages(ev){
+  const items=(ev.clipboardData&&ev.clipboardData.items)||[];
+  const files=[];
+  for(const it of items){ if(it.type&&it.type.indexOf('image')===0){ const f=it.getAsFile(); if(f)files.push(f); } }
+  return files;
+}
+function handlePaste(ev,it,arr,elId,withImg){
+  const files=clipboardImages(ev); if(!files.length) return;
+  ev.preventDefault();
+  addImgsToItem(it,files,arr,elId,withImg);
+}
+let ivImgs=[], ivIdx=0;
+function openImg(imgs,idx){
+  ivImgs = Array.isArray(imgs)? imgs : [imgs]; ivIdx = idx||0;
+  showIv();
+  document.getElementById('imgView').classList.add('open');
+}
+function showIv(){
+  if(!ivImgs.length) return;
+  if(ivIdx<0) ivIdx=ivImgs.length-1; if(ivIdx>=ivImgs.length) ivIdx=0;
+  document.getElementById('imgViewImg').src=ivImgs[ivIdx];
+  const multi=ivImgs.length>1;
+  document.getElementById('ivPrev').style.display=multi?'':'none';
+  document.getElementById('ivNext').style.display=multi?'':'none';
+  document.getElementById('ivCount').textContent=multi?(ivIdx+1)+' / '+ivImgs.length:'';
+}
+function closeIv(){ document.getElementById('imgView').classList.remove('open'); }
+document.getElementById('ivPrev').onclick=e=>{ e.stopPropagation(); ivIdx--; showIv(); };
+document.getElementById('ivNext').onclick=e=>{ e.stopPropagation(); ivIdx++; showIv(); };
+document.getElementById('imgViewImg').onclick=e=>e.stopPropagation();
+document.getElementById('imgView').onclick=closeIv;
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('imgView').classList.contains('open')) return;
+  if(e.key==='ArrowLeft'){ ivIdx--; showIv(); }
+  else if(e.key==='ArrowRight'){ ivIdx++; showIv(); }
+  else if(e.key==='Escape'){ closeIv(); }
+});
+// swipe on touch
+(function(){ let x0=null;
+  const v=document.getElementById('imgView');
+  v.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; },{passive:true});
+  v.addEventListener('touchend',e=>{ if(x0==null)return; const dx=e.changedTouches[0].clientX-x0;
+    if(Math.abs(dx)>40){ if(dx<0)ivIdx++; else ivIdx--; showIv(); } x0=null; });
+})();
+
+/* ============ meals + wishlist ============ */
+const mealsDaysEl=document.getElementById('mealsDays');
+function getMeal(day,slot){ return day.rows.find(r=>r.meal===slot); }
+let mealDrag=null; // {type:'wish',i} or {type:'cell',di,slot}
+
+function renderMeals(){
+  mealsDaysEl.innerHTML='';
+  const grid=document.createElement('div'); grid.className='meal-grid';
+  const n=state.days.length;
+  // fit up to ~10 days on desktop without horizontal scroll: shrink min width as days grow
+  const minW = n<=10 ? 0 : 118; // 0 => equal fractions that can shrink; wider forces scroll on mobile
+  grid.style.gridTemplateColumns='40px repeat('+n+', minmax('+(minW||60)+'px,1fr))';
+
+  grid.appendChild(cell('meal-corner',''));
+  state.days.forEach((day,di)=>{
+    const h=document.createElement('div'); h.className='meal-col-head';
+    h.innerHTML='<div class="mh-day">Day '+(di+1)+'</div>'+(day.date?'<div class="mh-date">'+fmtDate(day.date)+'</div>':'');
+    grid.appendChild(h);
+  });
+
+  MEAL_SLOTS.forEach(([slot,label])=>{
+    const rl=document.createElement('div'); rl.className='meal-rowlabel'; rl.textContent=label;
+    grid.appendChild(rl);
+    state.days.forEach((day,di)=>{
+      const m=getMeal(day,slot);
+      if(!m){
+        // deleted slot: greyed, not selectable; a ＋ in the middle adds it back
+        const c=document.createElement('div'); c.className='mcell mdeleted';
+        const add=document.createElement('button'); add.className='mcell-add'; add.textContent='＋';
+        add.title='加回'+label+'餐';
+        add.onclick=()=>{ addMealSlot(day,slot); render(); renderMeals(); markDirty(); };
+        c.appendChild(add);
+        grid.appendChild(c);
+        return;
+      }
+      const locked=!!m.mealLock;
+      const dispCls=locked?'m-lock':(m.mealStatus||'m-red');
+      const c=document.createElement('div'); c.className='mcell '+dispCls;
+      const grip=document.createElement('span'); grip.className='mcell-grip'; grip.textContent=locked?'🔒':'⠿';
+      grip.title=locked?'已鎖定，不能拖動':'拖動搬去別格';
+      const st=document.createElement('button'); st.className='mcell-status'; st.textContent=MEAL_ICON[m.mealStatus||'m-red'];
+      st.title='切換：未定→已決定→黃底粗紅';
+      st.onclick=()=>{ const i=MEAL_STATUS.indexOf(m.mealStatus||'m-red'); m.mealStatus=MEAL_STATUS[(i+1)%MEAL_STATUS.length]; render(); renderMeals(); markDirty(); };
+      const lk=document.createElement('button'); lk.className='mcell-lock'+(locked?' on':''); lk.textContent=locked?'🔒':'🔓';
+      lk.title=locked?'已鎖定，點一下解鎖':'鎖定此餐';
+      lk.onclick=()=>{ m.mealLock=!m.mealLock; render(); renderMeals(); markDirty(); };
+      const nm=ta(m.place,'', v=>{ m.place=v; render(); });
+      nm.className='mcell-in';
+      c.append(grip,st,lk,nm);
+
+      // drag only via grip; locked cells can't be dragged
+      c.draggable=false;
+      grip.addEventListener('mousedown',()=>{ if(!locked) c.draggable=true; });
+      grip.addEventListener('touchstart',()=>{ if(!locked) c.draggable=true; },{passive:true});
+      c.addEventListener('dragstart',e=>{ if(locked){e.preventDefault();return;} mealDrag={type:'cell',di,slot}; e.dataTransfer.effectAllowed='move'; c.classList.add('mdragging'); });
+      c.addEventListener('dragend',()=>{ c.draggable=false; c.classList.remove('mdragging'); document.querySelectorAll('.mcell.mover').forEach(x=>x.classList.remove('mover')); });
+      // drop target (locked cells still receive? no — locked shouldn't be overwritten)
+      c.addEventListener('dragover',e=>{ if(locked)return; e.preventDefault(); c.classList.add('mover'); });
+      c.addEventListener('dragleave',()=>c.classList.remove('mover'));
+      c.addEventListener('drop',e=>{
+        e.preventDefault(); c.classList.remove('mover');
+        if(!mealDrag||locked) return;
+        if(mealDrag.type==='wish'){
+          const w=state.wish[mealDrag.i]; if(w){ m.place = m.place? (m.place+' / '+w.text) : w.text; if((m.mealStatus||'m-red')==='m-red') m.mealStatus='m-green'; w.done=true; }
+        } else if(mealDrag.type==='cell'){
+          const src=getMeal(state.days[mealDrag.di],mealDrag.slot);
+          if(src && src!==m && !src.mealLock){
+            const tmp=m.place; m.place=src.place; src.place=tmp;
+            const ts=m.mealStatus; m.mealStatus=src.mealStatus; src.mealStatus=ts;
+          }
+        }
+        mealDrag=null; render(); renderMeals(); renderWish(); markDirty();
+      });
+      grid.appendChild(c);
+    });
+  });
+  mealsDaysEl.appendChild(grid);
+  document.addEventListener('mouseup',mealDragReset,{once:true});
+  mealsDaysEl.querySelectorAll('textarea').forEach(autosize);
+  renderMealSummary();
+}
+function mealDragReset(){ document.querySelectorAll('.mcell').forEach(c=>c.draggable=false); }
+function cell(cls,txt){ const e=document.createElement('div'); e.className=cls; e.textContent=txt; return e; }
+
+function renderMealSummary(){
+  let total=0,lock=0,green=0,red=0,yellow=0;
+  state.days.forEach(day=>{ MEAL_SLOTS.forEach(([slot])=>{
+    const m=getMeal(day,slot); if(!m) return;
+    total++;
+    if(m.mealLock)lock++;
+    const s=m.mealStatus||'m-red';
+    if(s==='m-green')green++; else if(s==='m-yellow')yellow++; else red++;
+  });});
+  const el=document.getElementById('mealSummary');
+  el.innerHTML='共 <b>'+total+'</b> 餐　·　🔒 鎖定 <b>'+lock+'</b>　·　🟢 已決定 <b>'+green+'</b>　·　🟡 待辦 <b>'+yellow+'</b>　·　'+
+    (red>0?'<span class="warn">🔴 未定 '+red+' 餐</span>':'🔴 未定 <b>0</b>　✓ 全部安排好');
+}
+
+function renderWish(){
+  const box=document.getElementById('wishList'); box.innerHTML='';
+  state.wish.forEach((w,i)=>{
+    const it=document.createElement('div');
+    it.className='witem'+(w.done?' picked':'');
+    it.draggable=true;
+    it.addEventListener('dragstart',e=>{ mealDrag={type:'wish',i}; e.dataTransfer.effectAllowed='copy'; it.classList.add('mdragging'); });
+    it.addEventListener('dragend',()=>it.classList.remove('mdragging'));
+    const grip=document.createElement('span'); grip.className='wgrip'; grip.textContent='⠿';
+    it.appendChild(grip);
+    const txt=document.createElement('div'); txt.className='wtext';
+    txt.appendChild(ta(w.text,'想食…',v=>{w.text=v;}));
+    it.appendChild(txt);
+    if(w.done){ const undo=document.createElement('button'); undo.className='wundo'; undo.textContent='↩'; undo.title='標記回未用';
+      undo.onclick=()=>{ w.done=false; renderWish(); }; it.appendChild(undo); }
+    const del=document.createElement('button'); del.className='wdel'; del.textContent='✕';
+    del.onclick=()=>{ state.wish.splice(i,1); renderWish(); markDirty(); };
+    it.appendChild(del);
+    box.appendChild(it);
+  });
+  box.querySelectorAll('textarea').forEach(autosize);
+  document.getElementById('wlHint').textContent='';
+}
+document.getElementById('btnAddWish').onclick=()=>{ state.wish.push({text:'',done:false}); renderWish(); markDirty(); };
+
+/* ============ tabs ============ */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  const v=document.getElementById('view-'+t.dataset.view);
+  v.classList.add('active');
+  // textareas measured 0-height while hidden — fix now that they're visible
+  requestAnimationFrame(()=>v.querySelectorAll('textarea').forEach(autosize));
+});
+
+/* ============ add buttons ============ */
+document.getElementById('btnAddDay').onclick=()=>{ const nd=blankDay(); const last=state.days[state.days.length-1]; if(last&&last.date) nd.date=addDays(last.date,1); state.days.push(nd); render(); renderMeals(); markDirty(); };
+document.getElementById('btnAddBuy').onclick=()=>{ state.buy.push({text:'',sub:'',imgs:[],done:false}); renderList(state.buy,'buyList',true); markDirty(); };
+document.getElementById('btnAddTodo').onclick=()=>{ state.todo.push({text:'',sub:'',done:false}); renderList(state.todo,'todoList',false); markDirty(); };
+document.getElementById('tripNameEdit').oninput=e=>{ state.name=e.target.value; markDirty(); };
+
+/* any edit inside the editor marks dirty */
+document.getElementById('editor').addEventListener('input',markDirty);
+document.getElementById('editor').addEventListener('click',e=>{ if(e.target.closest('.mini,.day-x,.addrow,.expand')) markDirty(); });
+
+/* ============ library screen ============ */
+const libEl=document.getElementById('library');
+const edEl=document.getElementById('editor');
+
+function tripMeta(t){
+  const d=t.data||{}; const days=(d.days||[]).length;
+  return days+' 天'+(t.updated?' · '+new Date(t.updated).toLocaleDateString():'');
+}
+function renderLibrary(){
+  const trips=loadTrips();
+  const grid=document.getElementById('libGrid'); grid.innerHTML='';
+  trips.forEach(t=>{
+    const c=document.createElement('div'); c.className='card';
+    c.onclick=()=>openTrip(t.id);
+    const nm=document.createElement('div'); nm.className='cname'; nm.textContent=(t.data&&t.data.name)||'未命名行程';
+    const meta=document.createElement('div'); meta.className='cmeta'; meta.textContent=tripMeta(t);
+    const acts=document.createElement('div'); acts.className='cacts';
+    const edit=document.createElement('button'); edit.className='edit'; edit.innerHTML='✎'; edit.title='編輯';
+    edit.onclick=e=>{e.stopPropagation();openTrip(t.id);};
+    const dup=document.createElement('button'); dup.className='dup'; dup.innerHTML='⧉'; dup.title='複製';
+    dup.onclick=e=>{e.stopPropagation();const arr=loadTrips();const copy=JSON.parse(JSON.stringify(t));copy.id=uid();copy.data.name=(copy.data.name||'行程')+' (副本)';copy.updated=Date.now();arr.unshift(copy);saveTrips(arr);renderLibrary();};
+    const del=document.createElement('button'); del.className='del'; del.innerHTML='🗑'; del.title='刪除';
+    del.onclick=e=>{e.stopPropagation();if(confirm('刪除「'+((t.data&&t.data.name)||'未命名行程')+'」？此動作無法復原。')){saveTrips(loadTrips().filter(x=>x.id!==t.id));renderLibrary();}};
+    acts.append(edit,dup,del);
+    c.append(acts,nm,meta);
+    grid.appendChild(c);
+  });
+  const add=document.createElement('div'); add.className='card add';
+  add.innerHTML='<div class="plus">＋</div>新增行程';
+  add.onclick=()=>newTrip();
+  grid.appendChild(add);
+}
+
+function showLibrary(){ edEl.style.display='none'; libEl.style.display='block'; window.scrollTo(0,0); renderLibrary(); }
+function showEditor(){ libEl.style.display='none'; edEl.style.display='block'; }
+
+function newTrip(){
+  currentId=null; state=blankState(); clearDirty(); showEditor(); boot();
+  document.querySelector('.tab[data-view="itin"]').click();
+}
+function openTrip(id){
+  const t=loadTrips().find(x=>x.id===id); if(!t)return;
+  currentId=id; state=JSON.parse(JSON.stringify(t.data)); clearDirty(); showEditor(); boot();
+  document.querySelector('.tab[data-view="itin"]').click();
+}
+
+/* ============ save to browser ============ */
+function persist(){
+  const arr=loadTrips();
+  if(currentId){
+    const t=arr.find(x=>x.id===currentId);
+    if(t){ t.data=state; t.updated=Date.now(); }
+    else { currentId=uid(); arr.unshift({id:currentId,data:state,updated:Date.now()}); }
+  } else {
+    currentId=uid(); arr.unshift({id:currentId,data:state,updated:Date.now()});
+  }
+  saveTrips(arr); clearDirty();
+}
+document.getElementById('btnSave').onclick=()=>{
+  if(!state.name.trim() && !confirm('這個行程還沒命名，仍要儲存嗎？')) { document.getElementById('tripNameEdit').focus(); return; }
+  persist();
+  const b=document.getElementById('btnSave'); const o=b.textContent; b.textContent='已儲存 ✓';
+  setTimeout(()=>b.textContent=o,1200);
+};
+document.getElementById('btnBack').onclick=()=>{
+  if(dirty && !confirm('有未儲存的變更，離開會遺失。要離開嗎？（可先按「儲存」）')) return;
+  showLibrary();
+};
+
+/* ============ export as image (self-contained canvas, no external libs) ============ */
+document.getElementById('btnExportImg').onclick=()=>exportImage();
+
+function exportImage(){
+  const DPR=2, W=920, pad=28;
+  const COL={paper:'#f7f3ea',ink:'#23201b',soft:'#6b6559',line:'#d9d2c4',accent:'#3a6b5f',
+    green:'#dff0d8',red:'#f7dcd8',lock:'#ece8df',bred:'#b23a2e'};
+  // measure pass on a temp canvas
+  const meas=document.createElement('canvas').getContext('2d');
+  const FS={h1:26,day:16,cell:14,small:12};
+  function setF(px,bold){ meas.font=(bold?'600 ':'')+px+'px "Yu Mincho","Noto Serif TC",sans-serif'; }
+  function wrap(ctx,text,maxW){
+    const words=(text||'').split(/(\s|、|，|·|\/)/); const lines=[]; let cur='';
+    for(const w of words){ const t=cur+w; if(ctx.measureText(t).width>maxW && cur){ lines.push(cur); cur=w; } else cur=t; }
+    if(cur) lines.push(cur); return lines.length?lines:[''];
+  }
+  const lh=22, rowPadY=8;
+  // layout columns for a day's rows
+  const gx=pad, gw=W-pad*2;
+  const cTime=64, cPlace=Math.round((gw-cTime)*0.46), cNote=gw-cTime-cPlace;
+
+  // compute height
+  let H=pad;
+  setF(FS.h1,true); H+=FS.h1+18;
+  setF(FS.small,false); H+=FS.small+16; // subtitle line
+  const meals=[['b','早'],['l','午'],['d','晚']];
+  state.days.forEach((day,di)=>{
+    H+=34; // day head
+    meas.font=FS.cell+'px sans-serif';
+    day.rows.forEach(r=>{
+      const label=r.meal?({b:'早餐 ',l:'午餐 ',d:'晚餐 '}[r.meal]):'';
+      const place=(label+ (r.place||'')).trim();
+      const pl=wrap(meas,place||'—',cPlace-16);
+      const nl=wrap(meas,r.note||'',cNote-16);
+      const lines=Math.max(pl.length,nl.length,1);
+      H+=lines*lh+rowPadY*2+2;
+    });
+    H+=12;
+  });
+  H+=pad;
+
+  const cv=document.createElement('canvas'); cv.width=W*DPR; cv.height=H*DPR;
+  const ctx=cv.getContext('2d'); ctx.scale(DPR,DPR);
+  ctx.fillStyle=COL.paper; ctx.fillRect(0,0,W,H);
+  ctx.textBaseline='top';
+
+  let y=pad;
+  // title
+  ctx.fillStyle=COL.ink; setF(FS.h1,true);
+  ctx.fillText(state.name||'旅行行程', pad, y); y+=FS.h1+6;
+  ctx.fillStyle=COL.soft; setF(FS.small,false);
+  const d0=state.days[0]&&state.days[0].date, dN=state.days[state.days.length-1]&&state.days[state.days.length-1].date;
+  const range=(d0?fmtDate(d0):'')+(dN&&dN!==d0?' – '+fmtDate(dN):'')+'　共 '+state.days.length+' 天';
+  ctx.fillText(range.trim(), pad, y); y+=FS.small+14;
+
+  state.days.forEach((day,di)=>{
+    // day head bar
+    ctx.fillStyle='#e4efe9'; roundRect(ctx,gx,y,gw,28,6); ctx.fill();
+    ctx.fillStyle=COL.accent; setF(FS.day,true);
+    ctx.fillText('Day '+(di+1)+(day.date?'　'+fmtDate(day.date):''), gx+10, y+5);
+    if(day.hotel){ setF(FS.small,false); ctx.fillStyle=COL.soft;
+      const ht='🏨 '+day.hotel; const hw=ctx.measureText(ht).width;
+      ctx.fillText(ht, gx+gw-hw-10, y+8);
+    }
+    y+=34;
+
+    day.rows.forEach(r=>{
+      const isMeal=!!r.meal;
+      const status=isMeal?(r.mealStatus||'m-red'):(r.status||'');
+      const label=isMeal?({b:'早餐 ',l:'午餐 ',d:'晚餐 '}[r.meal]):'';
+      const place=(label+(r.place||'')).trim()||'—';
+      setF(FS.cell,false);
+      const pl=wrap(ctx,place,cPlace-16);
+      const nl=wrap(ctx,r.note||'',cNote-16);
+      const lines=Math.max(pl.length,nl.length,1);
+      const rh=lines*lh+rowPadY*2;
+      // bg by status
+      let bg=null;
+      if(status==='st-green'||status==='m-green') bg=COL.green;
+      else if(status==='st-red'||status==='m-red') bg=COL.red;
+      else if(status==='st-bred'||status==='m-yellow') bg=COL.yellow;
+      else if(status==='m-lock') bg=COL.lock;
+      if(bg){ ctx.fillStyle=bg; roundRect(ctx,gx,y,gw,rh,5); ctx.fill(); }
+      ctx.strokeStyle=COL.line; ctx.lineWidth=1; roundRect(ctx,gx,y,gw,rh,5); ctx.stroke();
+      // dividers
+      ctx.strokeStyle='#eae4d7';
+      line(ctx,gx+cTime,y,gx+cTime,y+rh); line(ctx,gx+cTime+cPlace,y,gx+cTime+cPlace,y+rh);
+      // time
+      ctx.fillStyle=COL.accent; setF(FS.cell,false);
+      wrap(ctx,r.time||'',cTime-10).forEach((t,k)=>ctx.fillText(t,gx+8,y+rowPadY+k*lh));
+      const bold=(status==='st-bred'||status==='m-yellow');
+      // place
+      setF(FS.cell,bold); ctx.fillStyle=bold?COL.bred:COL.ink;
+      pl.forEach((t,k)=>ctx.fillText(t,gx+cTime+8,y+rowPadY+k*lh));
+      // note (also bold red when yellow/bred)
+      setF(FS.cell,bold); ctx.fillStyle=bold?COL.bred:COL.soft;
+      nl.forEach((t,k)=>ctx.fillText(t,gx+cTime+cPlace+8,y+rowPadY+k*lh));
+      y+=rh+2;
+    });
+    y+=10;
+  });
+
+  const url=cv.toDataURL('image/png');
+  const a=document.createElement('a');
+  a.href=url; a.download=(state.name||'行程').replace(/[\/\\:*?"<>|]/g,'_')+'.png'; a.click();
+}
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function line(ctx,x1,y1,x2,y2){ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); }
+
+/* ============ export / import (single HTML) ============ */
+function collect(){ return JSON.stringify(state); }
+document.getElementById('btnExport').onclick=()=>{
+  const data=collect();
+  const html=document.documentElement.outerHTML
+    .replace(/<script id="saved-data"[\s\S]*?<\/script>/,'')
+    .replace('</body>',`<script id="saved-data" type="application/json">${data.replace(/</g,'\\u003c')}</`+`script></body>`);
+  const blob=new Blob(['<!DOCTYPE html>\n'+html],{type:'text/html'});
+  const a=document.createElement('a');
+  const nm=(state.name||'行程').replace(/[\/\\:*?"<>|]/g,'_');
+  a.href=URL.createObjectURL(blob); a.download=nm+'.html'; a.click();
+};
+function doImport(file){
+  const rd=new FileReader();
+  rd.onload=()=>{ try{
+    const m=rd.result.match(/<script id="saved-data"[^>]*>([\s\S]*?)<\/script>/);
+    if(m){
+      const imported=JSON.parse(m[1].replace(/\\u003c/g,'<'));
+      const arr=loadTrips(); const id=uid();
+      arr.unshift({id,data:imported,updated:Date.now()}); saveTrips(arr);
+      currentId=id; state=imported; clearDirty(); showEditor(); boot();
+      document.querySelector('.tab[data-view="itin"]').click();
+    } else alert('這個檔案沒有可匯入的行程資料。');
+  }catch(err){ alert('匯入失敗：'+err.message); } };
+  rd.readAsText(file);
+}
+document.getElementById('fileInput').onchange=e=>{ const f=e.target.files[0]; if(f)doImport(f); e.target.value=''; };
+document.getElementById('btnImport2').onclick=()=>document.getElementById('fileInput').click();
+
+/* ============ boot ============ */
+function boot(){
+  state=migrate(state);
+  pickedWish=null;
+  document.getElementById('tripNameEdit').value=state.name||'';
+  render();
+  renderMeals();
+  renderWish();
+  renderList(state.buy,'buyList',true);
+  renderList(state.todo,'todoList',false);
+}
+window.addEventListener('beforeunload',e=>{ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+
+(function init(){
+  // if opened from an exported single-file HTML, load that trip into the editor (unsaved)
+  const saved=document.getElementById('saved-data');
+  if(saved){
+    try{
+      const d=JSON.parse(saved.textContent.replace(/\\u003c/g,'<'));
+      currentId=null; state=d; showEditor(); boot(); markDirty();
+      return;
+    }catch(e){}
+  }
+  showLibrary();
+})();
+</script>
+</body>
+</html>
