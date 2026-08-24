@@ -366,7 +366,12 @@
     padding:0 4px;line-height:1}
   .day-caret:hover{color:var(--ink)}
   .day-preview{font-size:12px;color:var(--ink-soft);margin-left:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-  .day.collapsed .day-head{border-bottom:none}
+  .day-flow{font-size:12.5px;color:#4a4438;flex:1;line-height:1.7;min-width:0}
+  .day-flow.empty{color:#b0a892}
+  .flow-arrow{color:#b0a892;margin:0 5px}
+  .flow-meal{color:var(--red-b);font-weight:700}
+  .day.collapsed .day-head{border-bottom:none;align-items:flex-start;flex-wrap:wrap}
+  .day.collapsed .day-caret,.day.collapsed .day-badge{margin-top:1px}
 
   footer{margin-top:30px}
 
@@ -385,7 +390,7 @@
 <div class="wrap">
   <header>
     <h1>行程<span class="en">TRIP PLANNER</span></h1>
-    <span class="ver" id="verBadge">v2.4</span>
+    <span class="ver" id="verBadge">v2.5</span>
   </header>
 
   <!-- ===== LIBRARY (overview) ===== -->
@@ -483,7 +488,7 @@
 
 <script>
 /* ============ version ============ */
-const APP_VERSION = "2.4";
+const APP_VERSION = "2.5";
 const STORE_KEY = "tripPlannerTrips";
 document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
 
@@ -588,22 +593,38 @@ function render(){
     caret.onclick=()=>{ day.collapsed=!day.collapsed; render(); };
     const badge=document.createElement('span'); badge.className='day-badge'; badge.textContent='Day '+(di+1);
     const date=dateField(day,di);
-    const hotelWrap=document.createElement('div'); hotelWrap.className='hotel-wrap';
-    const hotel=inp('hotel',day.hotel,'🏨 今晚住宿…',v=>{day.hotel=v; hmap.disabled=!v.trim();});
-    const hmap=document.createElement('button'); hmap.className='mapicon hotelmap'; hmap.title='在 Google Maps 搜尋住宿';
-    hmap.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
-    hmap.disabled=!(day.hotel&&day.hotel.trim());
-    hmap.onclick=()=>{ const q=(day.hotel||'').trim(); if(q) window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank'); };
-    hotelWrap.append(hotel,hmap);
-    const del=document.createElement('button'); del.className='day-x'; del.textContent='✕'; del.title='刪除這天';
-    del.onclick=()=>{ if(confirm('刪除 Day '+(di+1)+'？')){ state.days.splice(di,1); if(!state.days.length)state.days.push(blankDay()); render(); renderMeals(); } };
-    head.append(caret,badge,date,hotelWrap,del);
-    // collapsed preview: show the day's meals inline
+    head.append(caret,badge,date);
+
     if(day.collapsed){
-      const prev=document.createElement('span'); prev.className='day-preview';
-      const ms=day.rows.filter(r=>r.meal&&r.place.trim()).map(r=>r.place.trim());
-      prev.textContent = ms.length? '🍴 '+ms.join(' · ') : '';
-      head.appendChild(prev);
+      // collapsed: no hotel, show flow of the day (style B — wraps, shows all)
+      const flow=document.createElement('span'); flow.className='day-flow';
+      const parts=[];
+      day.rows.forEach(r=>{
+        const name=(r.place||'').trim(); if(!name) return;
+        const tag=r.meal?({b:'早',l:'午',d:'晚'}[r.meal]):'';
+        parts.push({tag,name});
+      });
+      if(parts.length){
+        parts.forEach((p,k)=>{
+          if(k>0){ const ar=document.createElement('span'); ar.className='flow-arrow'; ar.textContent='→'; flow.appendChild(ar); }
+          if(p.tag){ const m=document.createElement('span'); m.className='flow-meal'; m.textContent=p.tag+' '; flow.appendChild(m); }
+          flow.appendChild(document.createTextNode(p.name));
+        });
+      } else {
+        flow.className='day-flow empty'; flow.textContent='（未填內容）';
+      }
+      head.appendChild(flow);
+    } else {
+      const hotelWrap=document.createElement('div'); hotelWrap.className='hotel-wrap';
+      const hotel=inp('hotel',day.hotel,'🏨 今晚住宿…',v=>{day.hotel=v; hmap.disabled=!v.trim();});
+      const hmap=document.createElement('button'); hmap.className='mapicon hotelmap'; hmap.title='在 Google Maps 搜尋住宿';
+      hmap.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+      hmap.disabled=!(day.hotel&&day.hotel.trim());
+      hmap.onclick=()=>{ const q=(day.hotel||'').trim(); if(q) window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank'); };
+      hotelWrap.append(hotel,hmap);
+      const del=document.createElement('button'); del.className='day-x'; del.textContent='✕'; del.title='刪除這天';
+      del.onclick=()=>{ if(confirm('刪除 Day '+(di+1)+'？')){ state.days.splice(di,1); if(!state.days.length)state.days.push(blankDay()); render(); renderMeals(); } };
+      head.append(hotelWrap,del);
     }
     d.appendChild(head);
 
@@ -1282,9 +1303,23 @@ document.getElementById('fileInput').onchange=e=>{ const f=e.target.files[0]; if
 document.getElementById('btnImport2').onclick=()=>document.getElementById('fileInput').click();
 
 /* ============ boot ============ */
+function autoCollapsePast(){
+  // collapse days whose date is before today; keep today + future expanded.
+  // only acts on days that have a date; leaves undated days untouched.
+  const now=new Date(); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  let anyDated=false;
+  state.days.forEach(day=>{
+    if(!day.date) return; const p=day.date.split('-'); if(p.length<3) return;
+    anyDated=true;
+    const dt=new Date(+p[0],+p[1]-1,+p[2]);
+    day.collapsed = dt < today; // past → collapsed, today/future → expanded
+  });
+  return anyDated;
+}
 function boot(){
   state=migrate(state);
   pickedWish=null;
+  autoCollapsePast();
   document.getElementById('tripNameEdit').value=state.name||'';
   render();
   renderMeals();
