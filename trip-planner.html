@@ -5,18 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>旅行行程規劃</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap');
   :root{
-    --ink:#23201b; --ink-soft:#6b6559; --line:#d9d2c4; --line-soft:#eae4d7;
-    --paper:#f7f3ea; --panel:#fffdf8; --accent:#3a6b5f; --accent-soft:#e4efe9;
-    --green:#dff0d8; --green-b:#2f7d32; --red:#f7dcd8; --red-b:#b23a2e;
-    --yellow:#fbf1c7;
-    --hover:#f0eadc;
+    --pink:#f4a9c4; --pink-d:#e087aa; --lav:#c9b6e8; --lav-d:#a98fd4;
+    --mint:#a7ddc6; --mint-d:#6bbf9e; --peach:#f8d49a; --peach-d:#e0a95f;
+    --ink:#6b5b8e; --ink-soft:#9d8fbb; --line:#ecdcf3; --line-soft:#f4ecf9;
+    --paper:#efe7f5; --panel:#ffffff; --accent:#c76b93; --accent-soft:#fbeef4;
+    --green:#eafaf1; --green-b:#4a9a6e; --red:#fef2f5; --red-b:#d074a0;
+    --yellow:#fef8ec; --yellow-b:#d89a3a;
+    --hover:#faf4fc;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
   body{
-    background:var(--paper); color:var(--ink);
-    font-family:"Hiragino Kaku Gothic ProN","Noto Sans TC","Yu Gothic",system-ui,sans-serif;
+    background:linear-gradient(165deg,#fde9f1 0%,#f0e6fb 55%,#e6f3ef 100%);
+    background-attachment:fixed; color:var(--ink);
+    font-family:"M PLUS Rounded 1c","Zen Maru Gothic","Noto Sans TC","Yu Gothic",system-ui,sans-serif;
     font-size:14px; line-height:1.5;
   }
   .wrap{max-width:1000px;margin:0 auto;padding:20px 16px 80px}
@@ -24,201 +28,227 @@
   /* header */
   header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
   header h1{
-    font-family:"Yu Mincho","Noto Serif TC",serif; font-weight:600;
-    font-size:26px; letter-spacing:.06em; margin:0;
+    font-family:"Zen Maru Gothic","Noto Serif TC",serif; font-weight:900;
+    font-size:26px; letter-spacing:.05em; margin:0; color:var(--accent);
+    text-shadow:0 2px 0 #fff;
   }
-  header h1 .en{font-size:12px;letter-spacing:.24em;color:var(--ink-soft);display:block;font-weight:400;font-family:system-ui}
+  header h1 .en{font-size:11px;letter-spacing:.24em;color:var(--lav-d);display:block;font-weight:700;font-family:"M PLUS Rounded 1c"}
   .tripname{
     flex:1;min-width:180px;border:none;background:transparent;
-    font-family:"Yu Mincho","Noto Serif TC",serif;font-size:20px;color:var(--ink);
-    border-bottom:1px dashed var(--line);padding:2px 4px;
+    font-family:"Zen Maru Gothic","Noto Serif TC",serif;font-size:20px;color:var(--ink);
+    border-bottom:2px dashed var(--line);padding:2px 4px;
   }
-  .tripname:focus{outline:none;border-bottom-color:var(--accent)}
+  .tripname:focus{outline:none;border-bottom-color:var(--pink)}
 
-  .ver{font-size:11px;color:var(--ink-soft);letter-spacing:.1em;border:1px solid var(--line);
-    border-radius:20px;padding:2px 9px;background:var(--panel);align-self:center;font-family:system-ui}
+  .ver{font-size:11px;color:var(--lav-d);letter-spacing:.1em;border:2px solid var(--line);font-weight:700;
+    border-radius:20px;padding:2px 10px;background:#fff;align-self:center}
 
   /* library */
   #library{padding-top:22px}
   .lib-sub{color:var(--ink-soft);font-size:13px;margin:0 2px 18px}
-  .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
   .card{
-    border:1px solid var(--line);border-radius:10px;background:var(--panel);
-    padding:16px 15px;cursor:pointer;position:relative;transition:box-shadow .12s,transform .12s;
-    min-height:104px;display:flex;flex-direction:column;
+    border:3px solid #fff;border-radius:22px;background:rgba(255,255,255,.85);
+    padding:18px 16px;cursor:pointer;position:relative;transition:box-shadow .14s,transform .14s;
+    min-height:108px;display:flex;flex-direction:column;box-shadow:0 6px 16px rgba(180,150,200,.16);
   }
-  .card:hover{box-shadow:0 4px 14px rgba(60,50,30,.1);transform:translateY(-1px)}
-  .card .cname{font-family:"Yu Mincho","Noto Serif TC",serif;font-size:17px;color:var(--ink);
-    letter-spacing:.04em;margin-bottom:6px;word-break:break-word;line-height:1.35}
+  .card:hover{box-shadow:0 10px 22px rgba(180,140,190,.24);transform:translateY(-2px)}
+  .card .cname{font-family:"Zen Maru Gothic","Noto Serif TC",serif;font-size:17px;color:var(--accent);font-weight:700;
+    letter-spacing:.03em;margin-bottom:6px;word-break:break-word;line-height:1.35}
   .card .cmeta{font-size:12px;color:var(--ink-soft);margin-top:auto}
-  .card .cacts{position:absolute;top:9px;right:9px;display:flex;gap:4px;opacity:0;transition:opacity .12s}
+  .card .cacts{position:absolute;top:10px;right:10px;display:flex;gap:5px;opacity:0;transition:opacity .12s}
   .card:hover .cacts{opacity:1}
-  .card .cacts button{border:1px solid var(--line);background:var(--paper);border-radius:6px;
-    width:26px;height:26px;cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--ink-soft)}
-  .card .cacts .edit:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .card .cacts .dup:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .card .cacts .del:hover{background:var(--red-b);color:#fff;border-color:var(--red-b)}
-  .card.add{align-items:center;justify-content:center;border-style:dashed;color:var(--accent);
-    font-size:14px;letter-spacing:.05em;background:transparent}
-  .card.add:hover{background:var(--accent-soft);box-shadow:none;transform:none}
-  .card.add .plus{font-size:26px;line-height:1;margin-bottom:4px}
+  .card .cacts button{border:none;background:#f6ecfb;border-radius:9px;
+    width:27px;height:27px;cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--lav-d);box-shadow:0 2px 4px rgba(180,150,200,.2)}
+  .card .cacts .edit:hover{background:var(--lav);color:#fff}
+  .card .cacts .dup:hover{background:var(--mint-d);color:#fff}
+  .card .cacts .del:hover{background:var(--pink);color:#fff}
+  .card.add{align-items:center;justify-content:center;border:3px dashed #e0cff0;color:var(--lav-d);
+    font-size:14px;font-weight:700;letter-spacing:.05em;background:rgba(255,255,255,.4);box-shadow:none}
+  .card.add:hover{background:var(--accent-soft);box-shadow:none;transform:translateY(-1px);border-color:var(--pink);color:var(--pink-d)}
+  .card.add .plus{font-size:28px;line-height:1;margin-bottom:4px}
   .lib-tools{margin-top:22px}
 
   /* namebar */
   .namebar{margin:16px 0 2px}
   .tripname-edit{width:100%;border:none;background:transparent;
-    font-family:"Yu Mincho","Noto Serif TC",serif;font-size:22px;color:var(--ink);
-    border-bottom:1px dashed var(--line);padding:4px 4px 6px;}
-  .tripname-edit:focus{outline:none;border-bottom-color:var(--accent)}
+    font-family:"Zen Maru Gothic","Noto Serif TC",serif;font-size:23px;color:var(--accent);font-weight:700;
+    border-bottom:2px dashed var(--line);padding:4px 4px 6px;}
+  .tripname-edit:focus{outline:none;border-bottom-color:var(--pink)}
 
-  .backbtn{border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);
-    padding:7px 13px;border-radius:6px;cursor:pointer;font-size:12.5px;align-self:center;margin-right:4px}
-  .backbtn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .toolbtn.save{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
-  .toolbtn.save:hover{background:#2c554b}
+  .backbtn{border:2px solid var(--line);background:#fff;color:var(--lav-d);font-weight:700;
+    padding:7px 14px;border-radius:16px;cursor:pointer;font-size:12.5px;align-self:center;margin-right:4px}
+  .backbtn:hover{background:var(--lav);color:#fff;border-color:var(--lav)}
+  .toolbtn.save{background:var(--pink);color:#fff;border-color:var(--pink);font-weight:800;box-shadow:0 3px 0 var(--pink-d)}
+  .toolbtn.save:hover{background:var(--pink-d)}
   .toolbtn.save.dirty{animation:pulse 1.4s ease-in-out infinite}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(58,107,95,.5)}50%{box-shadow:0 0 0 5px rgba(58,107,95,0)}}
 
   /* tabs */
-  nav{display:flex;gap:2px;margin:16px 0 0;border-bottom:2px solid var(--ink);
-    position:sticky;top:0;z-index:20;background:var(--paper);padding-top:8px;flex-wrap:wrap;row-gap:4px}
+  nav{display:flex;gap:6px;margin:16px 0 0;border-bottom:none;
+    position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#f3ebf8,rgba(243,235,248,.85));
+    padding:10px 0 8px;flex-wrap:wrap;row-gap:6px;align-items:center}
   .tab{
-    border:1px solid var(--line);border-bottom:none;background:var(--panel);
-    padding:8px 18px;cursor:pointer;font-size:13px;letter-spacing:.05em;
-    color:var(--ink-soft);border-radius:6px 6px 0 0;position:relative;top:1px;
+    border:2px solid #e6d8f2;background:#fff;
+    padding:8px 18px;cursor:pointer;font-size:13px;letter-spacing:.03em;font-weight:700;
+    color:var(--lav-d);border-radius:16px;position:relative;
   }
-  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
-  .tab:not(.active):hover{background:var(--hover)}
+  .tab.active{background:var(--pink);color:#fff;border-color:var(--pink);box-shadow:0 3px 0 var(--pink-d)}
+  .tab:not(.active):hover{background:var(--hover);border-color:var(--lav)}
   .spacer{flex:1}
   .toolbtn{
-    border:1px solid var(--line);background:var(--panel);color:var(--ink);
-    padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12.5px;margin-left:6px;
+    border:2px solid #e6d8f2;background:#fff;color:var(--lav-d);font-weight:700;
+    padding:7px 15px;border-radius:16px;cursor:pointer;font-size:12.5px;margin-left:6px;
     align-self:center;
   }
-  .toolbtn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .toolbtn.ghost:hover{background:var(--red-b);border-color:var(--red-b)}
+  .toolbtn:hover{background:var(--lav);color:#fff;border-color:var(--lav)}
+  .toolbtn.ghost:hover{background:var(--pink);border-color:var(--pink)}
 
   .view{display:none;padding-top:20px}
   .view.active{display:block}
 
   /* ---- Itinerary ---- */
-  .day{margin-bottom:26px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+  .day{margin-bottom:20px;border:3px solid #fff;border-radius:24px;overflow:visible;
+    background:rgba(255,255,255,.8);box-shadow:0 8px 20px rgba(180,140,190,.16)}
+  .day.collapsed{padding-bottom:0}
   .day-head{
-    display:flex;align-items:center;gap:12px;background:var(--accent-soft);
-    padding:8px 12px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:12px;
+    padding:12px 16px;
   }
   .day-badge{
-    font-family:"Yu Mincho",serif;font-weight:600;color:var(--accent);
-    font-size:15px;letter-spacing:.08em;white-space:nowrap;
+    display:inline-flex;align-items:center;background:var(--pink);color:#fff;font-weight:800;
+    font-size:14px;padding:7px 15px;border-radius:20px 5px 20px 5px;white-space:nowrap;
+    box-shadow:0 4px 0 var(--pink-d);
   }
   .day-date{border:none;background:transparent;font-size:13px;color:var(--ink-soft);width:150px}
   .day-date:focus{outline:none}
   .date-wrap{position:relative;display:inline-flex}
-  .date-btn{border:1px solid var(--line);background:#fffef9;border-radius:5px;padding:4px 10px;
-    font-size:13px;color:var(--accent);cursor:pointer;font-family:system-ui;white-space:nowrap;font-variant-numeric:tabular-nums}
-  .date-btn:hover{border-color:var(--accent);background:var(--accent-soft)}
-  .date-btn.empty{color:var(--ink-soft);border-style:dashed}
+  .date-btn{border:2px dashed #ddc9ee;background:#faf4fd;border-radius:14px;padding:5px 12px;
+    font-size:12.5px;color:var(--ink);cursor:pointer;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .date-btn:hover{border-color:var(--lav)}
+  .date-btn.empty{color:var(--ink-soft)}
   .date-hidden{position:absolute;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none}
   .hotel{
-    flex:1;border:1px dashed var(--line);background:#fffef9;border-radius:5px;
-    padding:5px 9px;font-size:13px;color:var(--ink);
+    flex:1;border:2px dashed #ddc9ee;background:#faf4fd;border-radius:20px;
+    padding:6px 14px;font-size:12.5px;color:var(--ink);
   }
-  .hotel::placeholder{color:#b8b0a0}
-  .hotel:focus{outline:none;border-color:var(--accent);border-style:solid}
-  .hotel-wrap{flex:1;display:flex;align-items:center;gap:4px}
+  .hotel::placeholder{color:var(--ink-soft)}
+  .hotel:focus{outline:none;border-color:var(--lav);border-style:solid}
+  .hotel-wrap{flex:1;display:flex;align-items:center;gap:5px}
   .hotel-wrap .hotel{flex:1}
   .hotelmap{margin:0;flex:0 0 auto}
-  .day-x{margin-left:auto;border:none;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:15px;padding:2px 6px;border-radius:4px}
-  .day-x:hover{background:var(--red);color:var(--red-b)}
+  .day-x{margin-left:auto;border:none;background:transparent;color:#d9c9ee;cursor:pointer;font-size:15px;padding:2px 6px;border-radius:8px}
+  .day-x:hover{background:var(--red);color:var(--pink-d)}
+  .day-caret{border:none;background:#f6ecfb;color:var(--lav-d);width:28px;height:28px;border-radius:50%;
+    cursor:pointer;font-size:12px;flex:0 0 auto}
+  .day-caret:hover{background:var(--lav);color:#fff}
 
   /* grid rows */
-  .rows{padding:6px}
+  .rows{padding:8px 12px}
   .row{
-    display:grid;grid-template-columns:20px 96px 1fr 1.1fr;gap:0;
-    border:1px solid var(--line-soft);border-radius:6px;margin:5px 0;background:#fff;
-    position:relative;transition:box-shadow .12s;
+    display:grid;grid-template-columns:26px 90px 0.85fr 1.15fr;gap:0;
+    border:3px solid #f2e6f7;border-radius:18px;margin:8px 0;background:#fff;
+    position:relative;transition:box-shadow .12s;box-shadow:0 3px 0 #f0e4f7;
   }
-  .row.c4{grid-template-columns:20px 96px 1fr 1.1fr .9fr}
+  .row.c4{grid-template-columns:26px 90px 0.85fr 1.15fr .8fr}
   .row.dragging{opacity:.4}
-  .row.over{box-shadow:inset 0 3px 0 -1px var(--accent)}
-  .row.over-below{box-shadow:inset 0 -3px 0 -1px var(--accent)}
-  .row.st-green{background:var(--green)}
-  .row.st-red{background:var(--red)}
-  .row.st-bred{background:var(--yellow)}
+  .row.over{box-shadow:inset 0 4px 0 -1px var(--lav)}
+  .row.over-below{box-shadow:inset 0 -4px 0 -1px var(--lav)}
+  .row.st-green{background:var(--green);border-color:#bfe6d3;box-shadow:0 3px 0 #d6f0e3}
+  .row.st-red{background:var(--red);border-color:#f8cdd9;box-shadow:0 3px 0 #f8dbe3}
+  .row.st-bred{background:var(--yellow);border-color:#f6dfb0;box-shadow:0 3px 0 #f6e6c6}
   .row.st-bred .cell.col-place textarea,
-  .row.st-bred .cell.col-note textarea{font-weight:700;color:var(--red-b)}
+  .row.st-bred .cell.col-note textarea{font-weight:800;color:var(--red-b)}
+  /* corner marker for 當地做 */
+  .corner-mark{position:absolute;top:-9px;left:-9px;width:22px;height:22px;z-index:3;
+    background:#fff;border-radius:50%;display:none;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(180,150,200,.3)}
+  .row.st-bred .corner-mark{display:flex}
+  .corner-mark svg{width:20px;height:20px}
 
   .grip{
     display:flex;align-items:center;justify-content:center;cursor:grab;
-    color:#c3bbaa;font-size:13px;user-select:none;border-right:1px solid var(--line-soft);
+    color:#d9c9ee;user-select:none;border-right:2px solid var(--line-soft);
   }
+  .grip svg{width:15px;height:15px}
   .grip:active{cursor:grabbing}
-  .cell{border-right:1px solid var(--line-soft);position:relative}
+  .grip.locked{cursor:not-allowed;color:var(--lav-d)}
+  .cell{border-right:2px solid var(--line-soft);position:relative;display:flex;flex-direction:column;justify-content:center}
   .cell:last-child{border-right:none}
   .cell textarea{
     width:100%;border:none;background:transparent;resize:none;overflow:hidden;
-    font-family:inherit;font-size:13.5px;color:inherit;padding:8px 9px;line-height:1.45;
-    display:block;min-height:34px;
+    font-family:inherit;font-size:13.5px;color:inherit;padding:7px 9px;line-height:1.5;
+    display:block;min-height:32px;
   }
-  .cell textarea:focus{outline:2px solid var(--accent);outline-offset:-2px;background:#fffef7;border-radius:4px}
-  .cell.col-time textarea{color:var(--accent);font-variant-numeric:tabular-nums}
-  .cell.col-time{display:flex;flex-direction:column}
+  .cell textarea:focus{outline:2px solid var(--lav);outline-offset:-2px;background:#fdf9ff;border-radius:8px}
+  .cell.col-time{align-items:center;text-align:center;padding:4px 2px}
+  .cell.col-time textarea{color:var(--lav-d);font-weight:700;font-variant-numeric:tabular-nums;text-align:center;min-height:24px}
 
-  .col-place{display:flex;flex-direction:column}
-  .col-note{display:flex;flex-direction:column}
-  .place-top{display:flex;align-items:flex-start}
+  .col-place{display:flex;flex-direction:column;justify-content:center}
+  .col-note{display:flex;flex-direction:column;justify-content:center}
+  .place-top{display:flex;align-items:center;gap:5px;padding-right:6px}
   .place-top textarea{flex:1}
   .expand{
-    border:none;background:transparent;cursor:pointer;color:#b0a892;font-size:11px;
-    padding:8px 6px;line-height:1;align-self:stretch;
+    border:none;background:transparent;cursor:pointer;color:#c3b2e0;font-size:11px;
+    padding:6px;line-height:1;
   }
-  .expand:hover{color:var(--accent)}
-  .mapicon{
-    border:1px solid var(--line);background:var(--panel);cursor:pointer;color:var(--accent);
-    width:24px;height:24px;border-radius:5px;padding:0;margin:6px 2px 0 0;
-    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  .expand:hover{color:var(--lav-d)}
+  /* soft icon buttons (pen / map / url) */
+  .mapicon,.icobtn{
+    border:2.5px solid var(--line);background:#fff;cursor:pointer;color:var(--lav-d);
+    width:30px;height:30px;border-radius:11px;padding:0;margin:0;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2.5px 0 #efe3f7;
   }
-  .mapicon:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .mapicon:disabled{color:#c8c1b2;border-color:var(--line-soft);background:transparent;cursor:default}
+  .mapicon svg,.icobtn svg{width:16px;height:16px}
+  .mapicon:hover,.icobtn.pen:hover{background:var(--lav);color:#fff;border-color:var(--lav)}
+  .mapicon:disabled{color:#dcd0ec;border-color:var(--line-soft);background:#faf6fc;cursor:default;box-shadow:0 2.5px 0 #f4eef9}
+  .icobtn.map{color:var(--mint-d);border-color:#cceed6;box-shadow:0 2.5px 0 #d6f0e3}
+  .icobtn.map:hover{background:var(--mint);color:#fff;border-color:var(--mint)}
+  .icobtn.url{color:var(--peach-d);border-color:#f6dfb0;box-shadow:0 2.5px 0 #f6e6c6}
+  .icobtn.url:hover{background:var(--peach);color:#fff;border-color:var(--peach)}
   .note{
-    display:none;border-top:1px dashed var(--line-soft);padding:0;
+    display:none;border-top:2px dashed var(--line-soft);padding:0;
   }
   .note.open{display:block}
   .note textarea{
-    font-size:12.5px;color:var(--ink-soft);min-height:52px;background:#fbf9f3;
-    font-style:italic;
+    font-size:12.5px;color:var(--ink-soft);min-height:48px;background:#fdf9ff;
   }
   .maplink{
-    border:none;background:transparent;cursor:pointer;color:var(--accent);
+    border:none;background:transparent;cursor:pointer;color:var(--lav-d);
     font-size:11px;padding:4px 8px;text-align:left;text-decoration:underline;
-    text-underline-offset:2px;opacity:.75;
+    text-underline-offset:2px;opacity:.8;
   }
   .maplink:hover{opacity:1}
   .maplink:disabled{color:#c3bbaa;text-decoration:none;cursor:default;opacity:.5}
 
   .row-tools{
-    position:absolute;right:4px;top:-11px;display:none;gap:3px;z-index:2;
+    position:absolute;right:10px;top:-14px;display:none;gap:5px;z-index:4;
   }
   .row:hover .row-tools{display:flex}
   .mini{
-    border:1px solid var(--line);background:var(--panel);border-radius:5px;
-    width:22px;height:22px;cursor:pointer;font-size:11px;line-height:1;padding:0;
-    display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+    border:none;background:var(--lav);border-radius:12px;
+    width:27px;height:27px;cursor:pointer;padding:0;color:#fff;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 3px 6px rgba(180,150,200,.28);
   }
-  .mini:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .mini.color{font-size:14px}
+  .mini svg{width:15px;height:15px}
+  .mini.color{background:var(--lav)} .mini.color:hover{background:var(--lav-d)}
+  .mini.dup{background:var(--mint-d)} .mini.dup:hover{background:#5aad8d}
+  .mini.del{background:var(--pink)} .mini.del:hover{background:var(--pink-d)}
+  .mini.lockbtn{background:#e7dcf6;color:var(--lav-d)} .mini.lockbtn:hover{background:var(--lav);color:#fff}
+  .mini.lockbtn.on{background:var(--lav);color:#fff}
+  .mini.status{background:#fff;border:2px solid var(--line)}
+  .mini.status svg{width:18px;height:18px}
 
   .addrow{
-    width:100%;border:1px dashed var(--line);background:transparent;color:var(--ink-soft);
-    padding:7px;border-radius:6px;cursor:pointer;font-size:12.5px;margin-top:2px;
+    width:100%;border:2.5px dashed #e0cff0;background:transparent;color:var(--lav-d);font-weight:700;
+    padding:8px;border-radius:14px;cursor:pointer;font-size:13px;margin-top:2px;
   }
-  .addrow:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .addrow:hover{border-color:var(--pink);color:var(--pink-d);background:#fdf1f6}
 
   .addday{
-    display:block;margin:0 auto;border:1px solid var(--accent);color:var(--accent);
-    background:var(--panel);padding:9px 26px;border-radius:8px;cursor:pointer;font-size:13.5px;letter-spacing:.05em;
+    display:block;margin:0 auto;border:2.5px solid var(--pink);color:var(--pink-d);font-weight:800;
+    background:#fff;padding:10px 28px;border-radius:20px;cursor:pointer;font-size:13.5px;box-shadow:0 4px 0 #f8dbe3;
   }
-  .addday:hover{background:var(--accent);color:#fff}
+  .addday:hover{background:var(--pink);color:#fff}
 
   /* legend */
   .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin:6px 2px 18px;align-items:center}
@@ -351,8 +381,13 @@
   .mchip.lock{border:none;width:auto}
 
   /* meal tag in itinerary rows */
-  .meal-tag{text-align:center;font-family:"Yu Mincho",serif;font-size:11px;font-weight:600;
-    color:var(--accent);background:var(--accent-soft);border-radius:4px;margin:4px 4px 0;padding:1px 0}
+  .meal-tag{display:inline-flex;align-items:center;justify-content:center;gap:3px;color:#fff;font-weight:800;
+    font-size:11px;border-radius:11px;margin:0 auto 4px;padding:3px 9px;box-shadow:0 2px 0 rgba(0,0,0,.08)}
+  .meal-tag svg{width:14px;height:14px;display:block}
+  .meal-tag .mt-txt{line-height:1}
+  .meal-tag.meal-b{background:#f7b955;box-shadow:0 2px 0 #d99a34}
+  .meal-tag.meal-l{background:var(--pink);box-shadow:0 2px 0 var(--pink-d)}
+  .meal-tag.meal-d{background:var(--lav);box-shadow:0 2px 0 var(--lav-d)}
   .row.mealrow.m-green{background:var(--green)}
   .row.mealrow.m-red{background:var(--red)}
   .row.mealrow.m-lock{background:#ece8df}
@@ -370,6 +405,7 @@
   .day-flow.empty{color:#b0a892}
   .flow-arrow{color:#b0a892;margin:0 5px}
   .flow-meal{color:var(--red-b);font-weight:700}
+  .flow-bred{color:var(--red-b);font-weight:800}
   .day.collapsed .day-head{border-bottom:none;align-items:flex-start;flex-wrap:wrap}
   .day.collapsed .day-caret,.day.collapsed .day-badge{margin-top:1px}
 
@@ -390,7 +426,7 @@
 <div class="wrap">
   <header>
     <h1>行程<span class="en">TRIP PLANNER</span></h1>
-    <span class="ver" id="verBadge">v2.5</span>
+    <span class="ver" id="verBadge">v3.2</span>
   </header>
 
   <!-- ===== LIBRARY (overview) ===== -->
@@ -488,7 +524,7 @@
 
 <script>
 /* ============ version ============ */
-const APP_VERSION = "2.5";
+const APP_VERSION = "3.2";
 const STORE_KEY = "tripPlannerTrips";
 document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
 
@@ -497,6 +533,34 @@ const STATUS = ["", "st-green", "st-red", "st-bred"]; // cycle order
 const MEAL_STATUS = ["m-red","m-green","m-yellow"];   // cycle: 未定→已決定→黃底粗紅（鎖定為獨立掣）
 const MEAL_ICON = {"m-red":"🔴","m-green":"🟢","m-yellow":"🟡"};
 const MEAL_SLOTS = [["b","早"],["l","午"],["d","晚"]];
+
+/* ---- SVG icon set (pastel line style) ---- */
+const SVG = {
+  grip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="8" cy="6" r="1"/><circle cx="8" cy="12" r="1"/><circle cx="8" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>',
+  pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>',
+  color:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18Z" fill="currentColor" stroke="none"/></svg>',
+  dup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="3"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  lockOn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none"/></svg>',
+};
+function statusSVG(s,size){
+  size=size||18;
+  if(s==='m-green') return '<svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" fill="none" stroke="var(--mint-d)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" fill="#eafaf1"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>';
+  if(s==='m-yellow') return '<svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" fill="none" stroke="var(--peach-d)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" fill="#fef6e6"/><path d="M12 8v4.5"/><circle cx="12" cy="15.5" r=".9" fill="var(--peach-d)" stroke="none"/></svg>';
+  return '<svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" fill="none" stroke="var(--pink-d)" stroke-width="2"><circle cx="12" cy="12" r="8" fill="#fef2f5"/></svg>';
+}
+// corner ! mark for 當地做 — red to match text
+const CORNER_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="var(--red-b)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#fff"/><path d="M12 7.5v5"/><circle cx="12" cy="16" r="1" fill="var(--red-b)" stroke="none"/></svg>';
+// meal icons (all "A": sunrise / ramen bowl / moon)
+const MEAL_ICON_SVG={
+  b:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="4"/><path d="M12 3v2M5 7l1.5 1.5M19 7l-1.5 1.5M3 20h18"/></svg>',
+  l:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18a9 9 0 0 1-18 0Z"/><path d="M7 8s0-2 1.5-2M11 8s0-2 1.5-2M15 8s0-2 1.5-2"/></svg>',
+  d:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14a8 8 0 1 1-9-9 6 6 0 0 0 9 9Z"/></svg>'
+};
+
 let state = null;        // current trip being edited
 let currentId = null;    // id of trip in library (null = not yet saved)
 let dirty = false;
@@ -538,6 +602,7 @@ function migrate(d){
     if(!Array.isArray(day.rows)) day.rows=[];
     day.rows.forEach(r=>{ if(r.meal===undefined)r.meal=null; if(r.mealStatus===undefined)r.mealStatus="m-red"; if(r.link===undefined)r.link=""; if(r.linkOpen===undefined)r.linkOpen=false;
       if(r.mealLock===undefined) r.mealLock=false;
+      if(!Array.isArray(r.noteLinks)) r.noteLinks = r.link ? [r.link] : [];
       if(r.mealStatus==='m-lock'){ r.mealLock=true; r.mealStatus='m-green'; } // legacy lock → separate flag
     });
     // convert legacy day.meals object into meal rows if present
@@ -602,13 +667,17 @@ function render(){
       day.rows.forEach(r=>{
         const name=(r.place||'').trim(); if(!name) return;
         const tag=r.meal?({b:'早',l:'午',d:'晚'}[r.meal]):'';
-        parts.push({tag,name});
+        const isBred = r.meal ? ((r.mealStatus||'')==='m-yellow') : ((r.status||'')==='st-bred');
+        parts.push({tag,name,bred:isBred});
       });
       if(parts.length){
         parts.forEach((p,k)=>{
           if(k>0){ const ar=document.createElement('span'); ar.className='flow-arrow'; ar.textContent='→'; flow.appendChild(ar); }
           if(p.tag){ const m=document.createElement('span'); m.className='flow-meal'; m.textContent=p.tag+' '; flow.appendChild(m); }
-          flow.appendChild(document.createTextNode(p.name));
+          const nm=document.createElement('span');
+          if(p.bred){ nm.className='flow-bred'; nm.textContent='(！) '+p.name; }
+          else nm.textContent=p.name;
+          flow.appendChild(nm);
         });
       } else {
         flow.className='day-flow empty'; flow.textContent='（未填內容）';
@@ -695,65 +764,75 @@ function ta(val,ph,on){
 function rowEl(day,di,r,ri){
   const isMeal=!!r.meal;
   const row=document.createElement('div');
-  // itinerary: locked meals keep their status colour (only 三餐頁 greys out)
   const statusCls = isMeal ? (r.mealStatus||'m-red') : (r.status||'');
   row.className='row '+(isMeal?'mealrow ':'')+statusCls+(r.extra!==null?' c4':'')+(isMeal&&r.mealLock?' locked-meal':'');
   row.draggable=false;
+  const normLink=(u)=>{ u=(u||'').trim(); if(!u) return ''; return /^https?:\/\//i.test(u)?u:'https://'+u; };
 
-  const grip=document.createElement('div'); grip.className='grip'; grip.textContent='⠿';
+  // corner ! mark for 當地做 (yellow/m-yellow)
+  const corner=document.createElement('div'); corner.className='corner-mark'; corner.innerHTML=CORNER_SVG;
+  row.appendChild(corner);
+
+  const grip=document.createElement('div'); grip.className='grip'; grip.innerHTML=SVG.grip;
   row.appendChild(grip);
 
   // time (meal rows show 早/午/晚 tag above the time field)
   const cTime=document.createElement('div'); cTime.className='cell col-time';
   if(isMeal){
-    const tag=document.createElement('div'); tag.className='meal-tag';
-    tag.textContent={b:'早',l:'午',d:'晚'}[r.meal];
+    const tag=document.createElement('div'); tag.className='meal-tag meal-'+r.meal;
+    tag.innerHTML=MEAL_ICON_SVG[r.meal]+'<span class="mt-txt">'+({b:'早',l:'午',d:'晚'}[r.meal])+'</span>';
     cTime.appendChild(tag);
   }
   cTime.appendChild(ta(r.time,'時間',v=>r.time=v));
   row.appendChild(cTime);
 
-  // place (+ expand + note + maplink)
+  // place cell = map only: text + pen(input addr) + pin(open, only when addr filled)
   const cPlace=document.createElement('div'); cPlace.className='cell col-place';
   const top=document.createElement('div'); top.className='place-top';
   top.appendChild(ta(r.place, isMeal?'餐廳 / 想食…':'景點 / 活動', v=>{ r.place=v; if(isMeal) renderMeals(); }));
-  // maps icon (top-right of place cell) — opens addr, else place name
-  const mbtn=document.createElement('button'); mbtn.className='mapicon'; mbtn.title='在 Google Maps 開啟';
-  mbtn.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
-  const syncMap=()=>{ mbtn.disabled=!(r.addr&&r.addr.trim()); };
-  mbtn.onclick=()=>{ const q=(r.addr||'').trim(); if(q) window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank'); };
-  const exp=document.createElement('button'); exp.className='expand'; exp.textContent=r.detailOpen?'▲':'▼'; exp.title='展開詳細備註';
+  const pinBtn=document.createElement('button'); pinBtn.className='icobtn map'; pinBtn.title='在 Google Maps 開啟'; pinBtn.innerHTML=SVG.pin;
+  pinBtn.onclick=()=>{ const q=(r.addr||'').trim(); if(q) window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank'); };
+  const penBtn=document.createElement('button'); penBtn.className='icobtn pen'; penBtn.title='填地址'; penBtn.innerHTML=SVG.pen;
   const note=document.createElement('div'); note.className='note'+(r.detailOpen?' open':'');
-  const nt=ta(r.detail,'詳細備註…（展開輸入）',v=>r.detail=v); note.appendChild(nt);
+  const nt=ta(r.detail,'詳細備註…',v=>r.detail=v); note.appendChild(nt);
   const addr=document.createElement('input'); addr.className='hotel'; addr.style.margin='0 8px 8px'; addr.style.width='calc(100% - 16px)';
   addr.placeholder='📍 地址 / 地點名（填了才可開 Google Maps）'; addr.value=r.addr||'';
-  addr.oninput=()=>{r.addr=addr.value; syncMap();};
+  const syncPin=()=>{ pinBtn.style.display=(r.addr&&r.addr.trim())?'':'none'; };
+  addr.oninput=()=>{r.addr=addr.value; syncPin();};
   note.append(addr);
-  exp.onclick=()=>{ r.detailOpen=!r.detailOpen; note.classList.toggle('open'); exp.textContent=r.detailOpen?'▲':'▼'; if(r.detailOpen)autosize(nt); };
-  top.append(mbtn,exp);
-  syncMap();
+  penBtn.onclick=()=>{ r.detailOpen=!r.detailOpen; note.classList.toggle('open'); if(r.detailOpen){autosize(nt);addr.focus();} };
+  syncPin();
+  top.append(penBtn,pinBtn);
   cPlace.append(top,note);
   row.appendChild(cPlace);
 
-  // note/transport col (with hyperlink support)
+  // note cell = per-line urls: text + pen(edit urls) + globe(open, when any url)
+  if(!Array.isArray(r.noteLinks)) r.noteLinks=[];
   const cNote=document.createElement('div'); cNote.className='cell col-note';
   const ntop=document.createElement('div'); ntop.className='place-top';
-  ntop.appendChild(ta(r.note,'備註 / 交通（幾點到幾點）',v=>r.note=v));
-  const normLink=(u)=>{ u=(u||'').trim(); if(!u) return ''; return /^https?:\/\//i.test(u)?u:'https://'+u; };
-  const lbtn=document.createElement('button'); lbtn.className='mapicon linkicon'; lbtn.title='開啟連結（Klook / KKday 等）';
-  lbtn.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
-  const syncLink=()=>{ lbtn.disabled=!normLink(r.link); };
-  lbtn.onclick=()=>{ const u=normLink(r.link); if(u) window.open(u,'_blank'); };
-  const lexp=document.createElement('button'); lexp.className='expand'; lexp.textContent=r.linkOpen?'▲':'🔗'; lexp.title='貼上超連結';
-  const lnote=document.createElement('div'); lnote.className='note'+(r.linkOpen?' open':'');
-  const linput=document.createElement('input'); linput.className='hotel'; linput.style.margin='8px'; linput.style.width='calc(100% - 16px)';
-  linput.placeholder='🔗 貼上超連結（Klook / KKday / 官網訂位…）'; linput.value=r.link||'';
-  linput.oninput=()=>{ r.link=linput.value; syncLink(); };
-  lnote.append(linput);
-  lexp.onclick=()=>{ r.linkOpen=!r.linkOpen; lnote.classList.toggle('open'); lexp.textContent=r.linkOpen?'▲':'🔗'; };
-  ntop.append(lbtn,lexp);
-  syncLink();
-  cNote.append(ntop,lnote);
+  const noteTa=ta(r.note,'備註 / 交通（幾點到幾點）',v=>{ r.note=v; });
+  ntop.appendChild(noteTa);
+  const firstUrl=()=>{ for(const u of r.noteLinks){ if(normLink(u)) return normLink(u); } return ''; };
+  const gBtn=document.createElement('button'); gBtn.className='icobtn url'; gBtn.title='開啟連結'; gBtn.innerHTML=SVG.globe;
+  gBtn.onclick=()=>{ const u=firstUrl(); if(u) window.open(u,'_blank'); };
+  const nPen=document.createElement('button'); nPen.className='icobtn pen'; nPen.title='每行貼連結'; nPen.innerHTML=SVG.pen;
+  const lpanel=document.createElement('div'); lpanel.className='note'+(r.linkOpen?' open':'');
+  const buildLines=()=>{
+    lpanel.innerHTML='';
+    const lines=(r.note||'').split('\n');
+    lines.forEach((ln,i)=>{
+      const wrapL=document.createElement('div'); wrapL.style.display='flex'; wrapL.style.gap='6px'; wrapL.style.alignItems='center'; wrapL.style.margin='6px 8px';
+      const lab=document.createElement('div'); lab.textContent=ln.trim()||('第'+(i+1)+'行'); lab.style.cssText='flex:0 0 32%;font-size:12px;color:var(--ink);background:#f7f0fc;border-radius:10px;padding:6px 9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      const uin=document.createElement('input'); uin.className='hotel'; uin.style.flex='1'; uin.placeholder='🔗 貼連結'; uin.value=r.noteLinks[i]||'';
+      uin.oninput=()=>{ r.noteLinks[i]=uin.value; gBtn.style.display=firstUrl()?'':'none'; };
+      wrapL.append(lab,uin); lpanel.appendChild(wrapL);
+    });
+  };
+  nPen.onclick=()=>{ r.linkOpen=!r.linkOpen; lpanel.classList.toggle('open'); if(r.linkOpen) buildLines(); };
+  if(r.linkOpen) buildLines();
+  gBtn.style.display=firstUrl()?'':'none';
+  ntop.append(nPen,gBtn);
+  cNote.append(ntop,lpanel);
   row.appendChild(cNote);
 
   // optional 4th col
@@ -763,11 +842,11 @@ function rowEl(day,di,r,ri){
     row.appendChild(cEx);
   }
 
-  // row tools
+  // row tools (SVG)
   const tools=document.createElement('div'); tools.className='row-tools';
-  const color=document.createElement('button'); color.className='mini color';
-  color.innerHTML = isMeal ? MEAL_ICON[r.mealStatus||'m-red'] : '◑';
-  color.title=isMeal?'切換：未定→已決定→黃底粗紅':'切換顏色';
+  const color=document.createElement('button');
+  if(isMeal){ color.className='mini status'; color.innerHTML=statusSVG(r.mealStatus||'m-red'); color.title='切換：未定→已決定→當地做'; }
+  else { color.className='mini color'; color.innerHTML=SVG.color; color.title='切換顏色'; }
   color.onclick=()=>{
     if(isMeal){ const i=MEAL_STATUS.indexOf(r.mealStatus||'m-red'); r.mealStatus=MEAL_STATUS[(i+1)%MEAL_STATUS.length]; render(); renderMeals(); }
     else { const i=STATUS.indexOf(r.status||''); r.status=STATUS[(i+1)%STATUS.length]; render(); }
@@ -775,19 +854,16 @@ function rowEl(day,di,r,ri){
   tools.append(color);
   if(isMeal){
     const lock=document.createElement('button'); lock.className='mini lockbtn'+(r.mealLock?' on':'');
-    lock.textContent=r.mealLock?'🔒':'🔓'; lock.title=r.mealLock?'已鎖定，點一下解鎖':'鎖定此餐（旅館含餐/已訂）';
+    lock.innerHTML=r.mealLock?SVG.lockOn:SVG.lock; lock.title=r.mealLock?'已鎖定，點一下解鎖':'鎖定此餐（旅館含餐/已訂）';
     lock.onclick=()=>{ r.mealLock=!r.mealLock; render(); renderMeals(); };
     tools.append(lock);
   }
-  const col4=document.createElement('button'); col4.className='mini'; col4.textContent=r.extra!==null?'−4':'+4'; col4.title=r.extra!==null?'移除第四欄':'加第四欄';
-  col4.onclick=()=>{ r.extra=(r.extra!==null)?null:''; render(); };
-  tools.append(col4);
-  const dup=document.createElement('button'); dup.className='mini'; dup.textContent='⧉'; dup.title='複製此行（貼在下面）';
+  const dup=document.createElement('button'); dup.className='mini dup'; dup.innerHTML=SVG.dup; dup.title='複製此行（貼在下面）';
   dup.onclick=()=>{ const copy=JSON.parse(JSON.stringify(r)); copy.meal=null; copy.mealStatus='m-red'; copy.mealLock=false; day.rows.splice(ri+1,0,copy); render(); if(isMeal)renderMeals(); markDirty(); };
   tools.append(dup);
-  const rm=document.createElement('button'); rm.className='mini'; rm.textContent='✕';
+  const rm=document.createElement('button'); rm.className='mini del'; rm.innerHTML=SVG.del;
   rm.title=isMeal?'刪除此餐（之後可加回）':'刪除此行';
-  const rowHasContent=()=> (r.time||'').trim()||(r.place||'').trim()||(r.note||'').trim()||(r.detail||'').trim()||(r.addr||'').trim()||(r.link||'').trim()||(r.extra||'').trim();
+  const rowHasContent=()=> (r.time||'').trim()||(r.place||'').trim()||(r.note||'').trim()||(r.detail||'').trim()||(r.addr||'').trim()||(r.noteLinks&&r.noteLinks.some(u=>(u||'').trim()))||(r.extra||'').trim();
   rm.onclick=()=>{
     if(rowHasContent()){
       const label=(r.place||'').trim()|| (isMeal?({b:'早餐',l:'午餐',d:'晚餐'}[r.meal]):'這一行');
@@ -800,7 +876,7 @@ function rowEl(day,di,r,ri){
 
   // drag reorder — only when holding the grip; locked meals can't be dragged
   const locked = isMeal && r.mealLock;
-  if(locked){ grip.classList.add('locked'); grip.textContent='🔒'; grip.title='已鎖定，不能移動'; }
+  if(locked){ grip.classList.add('locked'); grip.innerHTML=SVG.lockOn; grip.title='已鎖定，不能移動'; }
   grip.addEventListener('mousedown',()=>{ if(!locked) row.draggable=true; });
   grip.addEventListener('touchstart',()=>{ if(!locked) row.draggable=true; },{passive:true});
   document.addEventListener('mouseup',()=>{ row.draggable=false; });
