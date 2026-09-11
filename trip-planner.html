@@ -136,6 +136,7 @@
   .tab.active{background:var(--pink);color:#fff;border-color:var(--pink);box-shadow:0 3px 0 var(--pink-d)}
   .tab:not(.active):hover{background:var(--hover);border-color:var(--lav)}
   .spacer{flex:1}
+  .nav-compact{display:none}   /* desktop: hide ⋯ menu, show all tabs */
   .toolbtn{
     border:2px solid #e6d8f2;background:#fff;color:var(--lav-d);font-weight:700;
     padding:7px 15px;border-radius:16px;cursor:pointer;font-size:12.5px;margin-left:6px;
@@ -630,6 +631,9 @@
   .rate-in{width:96px;border:2px solid var(--line);border-radius:12px;padding:6px 10px;font-family:inherit;
     font-size:15px;color:var(--ink);text-align:right;background:#fff}
   .rate-in:focus{outline:none;border-color:var(--pink)}
+  .rate-sym{width:56px;border:2px solid var(--line);border-radius:12px;padding:6px 8px;font-family:inherit;
+    font-size:15px;color:var(--accent);font-weight:800;text-align:center;background:#fff}
+  .rate-sym:focus{outline:none;border-color:var(--pink)}
   .rate-hint{font-size:12px;color:var(--ink-soft);margin-left:2px}
 
   .exp-section{margin-bottom:22px}
@@ -689,6 +693,15 @@
     .exp-pair{grid-template-columns:auto 1fr;gap:6px}
     /* collapsed day: flow drops to its own full-width line under the label */
     .day.collapsed .day-flow{flex-basis:100%;width:100%;margin-top:6px;line-height:1.8}
+    /* mobile top nav: hide full tab list, use ⋯ menu, fit ONE row */
+    nav .nav-full{display:none}
+    nav .nav-compact{display:inline-block}
+    nav{gap:4px;flex-wrap:nowrap;padding:8px 0 6px}
+    nav .backbtn{padding:6px 9px;font-size:12px;margin-right:2px}
+    nav .tab{padding:7px 11px;font-size:12.5px}
+    nav .toolbtn{padding:6px 10px;font-size:12px;margin-left:2px}
+    nav .more-btn{padding:6px 10px;font-size:15px;line-height:1}
+    nav .spacer{display:none}
   }
 </style>
 </head>
@@ -696,7 +709,7 @@
 <div class="wrap">
   <header>
     <h1>行程<span class="en">TRIP PLANNER</span></h1>
-    <span class="ver" id="verBadge">v5.3</span>
+    <span class="ver" id="verBadge">v5.5</span>
   </header>
 
   <!-- ===== LIBRARY (overview) ===== -->
@@ -716,10 +729,20 @@
   <nav>
     <button class="backbtn" id="btnBack" title="回行程總覽">‹ 總覽</button>
     <div class="tab active" data-view="itin">行程</div>
-    <div class="tab" data-view="buy">To Buy 手信</div>
+    <div class="tab" data-view="buy">買嘢</div>
+    <!-- desktop: all tabs laid out; mobile: hidden (use ⋯ menu) -->
+    <div class="tab nav-full" data-view="meals">三餐</div>
+    <div class="tab nav-full" data-view="todo">To Do</div>
+    <div class="tab nav-full" data-view="carry">攜帶</div>
+    <div class="tab nav-full" data-view="expense">消費</div>
+    <div class="spacer"></div>
     <button class="toolbtn save" id="btnSave">儲存</button>
-    <div class="more-wrap">
-      <button class="toolbtn more-btn" id="btnMore">⋯ 更多</button>
+    <button class="toolbtn nav-full" id="btnExportImg">匯出圖片</button>
+    <button class="toolbtn nav-full" id="btnExportPdf">匯出 PDF</button>
+    <button class="toolbtn nav-full" id="btnExport">匯出 HTML</button>
+    <!-- mobile: ⋯ menu holding the secondary tabs + exports -->
+    <div class="more-wrap nav-compact">
+      <button class="toolbtn more-btn" id="btnMore">⋯</button>
       <div class="more-menu" id="moreMenu">
         <div class="mm-tab" data-view="meals">三餐</div>
         <div class="mm-tab" data-view="todo">To Do</div>
@@ -731,15 +754,6 @@
         <button class="mm-act" id="btnExport2">匯出 HTML</button>
       </div>
     </div>
-    <div class="spacer"></div>
-    <!-- hidden originals kept for existing handlers/tests -->
-    <div class="tab" data-view="meals" hidden></div>
-    <div class="tab" data-view="todo" hidden></div>
-    <div class="tab" data-view="carry" hidden></div>
-    <div class="tab" data-view="expense" hidden></div>
-    <button id="btnExportImg" hidden></button>
-    <button id="btnExportPdf" hidden></button>
-    <button id="btnExport" hidden></button>
     <input type="file" id="fileInput" accept=".html" hidden>
   </nav>
 
@@ -797,7 +811,7 @@
   <!-- TO BUY -->
   <section class="view" id="view-buy">
     <div class="listwrap">
-      <h2 class="listhead">To Buy 手信</h2>
+      <h2 class="listhead">買嘢</h2>
       <p class="listsub">要買的手信、伴手禮。先打字，再點圖片格「＋」貼圖（Ctrl/⌘+V）或選檔，每項最多 10 張，方便把同款不同店的選擇擺一起。點圖可放大。</p>
       <div id="buyList"></div>
       <button class="addrow" id="btnAddBuy">＋ 加一項</button>
@@ -845,11 +859,14 @@
 
       <div class="rate-bar">
         <span class="rate-lab">匯率</span>
-        <span class="rate-eq">1 ¥ =</span>
-        <input type="number" id="fxRate" class="rate-in" step="0.0001" min="0" inputmode="decimal">
+        <span class="rate-eq">1</span>
+        <input type="text" id="fxSym" class="rate-sym" maxlength="4" list="curSyms" placeholder="¥">
+        <span class="rate-eq">=</span>
+        <input type="text" id="fxRate" class="rate-in" inputmode="decimal">
         <span class="rate-eq">HK$</span>
         <span class="rate-hint" id="rateHint"></span>
       </div>
+      <datalist id="curSyms"><option value="¥"><option value="US$"><option value="€"><option value="₩"><option value="฿"><option value="₫"><option value="£"><option value="RM"><option value="₱"><option value="NT$"></datalist>
 
       <div class="exp-section">
         <div class="exp-h">🏨 住宿<span class="exp-h-sub">酒店與晚數依「行程」頁自動帶入</span></div>
@@ -915,7 +932,7 @@
 
 <script>
 /* ============ version ============ */
-const APP_VERSION = "5.3";
+const APP_VERSION = "5.5";
 const STORE_KEY = "tripPlannerTrips";
 document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
 
@@ -982,7 +999,7 @@ function addMealSlot(day,slot){
   day.rows.splice(idx,0,r);
 }
 function blankDay(){ return {date:"",hotel:"",collapsed:false,rows:[mealRow('b'),mealRow('l'),mealRow('d')]}; }
-function blankExpense(){ return { rate:0.052, rows:[] }; } // rate: 1 JPY = ? HKD (default ~0.052)
+function blankExpense(){ return { rate:0.052, sym:'¥', rows:[] }; } // rate: 1 foreign = ? HKD
 function blankState(){ return { name:"", days:[blankDay()], buy:[], todo:[], wish:[], carry:[], carrySkip:[], carryChecked:[], expense:blankExpense() }; }
 
 /* migrate older saved trips so new fields exist */
@@ -994,6 +1011,7 @@ function migrate(d){
   if(!Array.isArray(d.carryChecked)) d.carryChecked=[]; // shared item ids ticked (packed) this trip
   if(!d.expense || typeof d.expense!=='object') d.expense=blankExpense();
   if(typeof d.expense.rate!=='number') d.expense.rate=0.052;
+  if(typeof d.expense.sym!=='string'||!d.expense.sym.trim()) d.expense.sym='¥';
   if(!Array.isArray(d.expense.rows)) d.expense.rows=[];
   if(Array.isArray(d.buy)) d.buy.forEach(b=>{
     if(!Array.isArray(b.imgs)) b.imgs = b.img ? [b.img] : [];
@@ -1311,7 +1329,7 @@ function rowEl(day,di,r,ri){
       const buyBtn=document.createElement('button'); buyBtn.className='icobtn buy'; buyBtn.title='連結手信'; buyBtn.innerHTML=SVG.cart;
       buyBtn.onclick=()=>{
         const list=state.buy||[];
-        if(!list.length){ alert('未有手信。先去「To Buy 手信」頁加項目，再返嚟連結。'); return; }
+        if(!list.length){ alert('未有項目。先去「買嘢」頁加項目，再返嚟連結。'); return; }
         tutBuyMenu(buyBtn,list,(bi)=>{
           lk.buyRef=bi; lk.url=''; lk.img=null; lk.name=buyLabel(bi); // description auto = souvenir name
           buildLines(); rebuildOpenStrip(); markDirty();
@@ -1545,7 +1563,7 @@ function openBuyPopover(idx){
   const b=state.buy&&state.buy[idx];
   const pop=document.getElementById('buyPop'), body=document.getElementById('buyPopBody');
   body.innerHTML='';
-  if(!b){ body.innerHTML='<div class="bp-empty">呢項手信已經喺「To Buy」頁刪除咗。</div>'; }
+  if(!b){ body.innerHTML='<div class="bp-empty">呢項已經喺「買嘢」頁刪除咗。</div>'; }
   else {
     const h=document.createElement('div'); h.className='bp-title'; h.textContent=(b.text||'').trim()||'（未命名手信）'; body.appendChild(h);
     if((b.sub||'').trim()){ const s=document.createElement('div'); s.className='bp-sub'; s.textContent=b.sub; body.appendChild(s); }
@@ -1554,7 +1572,7 @@ function openBuyPopover(idx){
       b.imgs.forEach((src,gi)=>{ const im=document.createElement('img'); im.src=src; im.onclick=()=>openImg(b.imgs,gi); g.appendChild(im); });
       body.appendChild(g);
     }
-    const go=document.createElement('button'); go.className='bp-go'; go.textContent='去 To Buy 頁睇 →';
+    const go=document.createElement('button'); go.className='bp-go'; go.textContent='去 買嘢 頁睇 →';
     go.onclick=()=>{ closeBuyPopover(); const t=document.querySelector('.tab[data-view="buy"]'); if(t) t.click(); };
     body.appendChild(go);
   }
@@ -1822,9 +1840,11 @@ document.getElementById('btnAddTripCarry').onclick=()=>{ state.carry.push({text:
 
 /* ============ expense ============ */
 const CUR_JPY='jpy', CUR_HKD='hkd';
-function toHKD(amt,cur,rate){ const a=+amt||0; return cur===CUR_JPY ? a*(+rate||0) : a; }
+function foreignSym(){ return (state.expense && (state.expense.sym||'').trim()) || '¥'; }
+function toHKD(amt,cur,rate){ const a=+amt||0; return cur===CUR_HKD ? a : a*(+rate||0); }
 function fmtHKD(n){ return 'HK$ '+ (Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2}); }
-function fmtJPY(n){ return '¥'+ Math.round(n).toLocaleString('en-US'); }
+function fmtForeign(n){ return foreignSym()+' '+ (Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2}); }
+function fmtJPY(n){ return fmtForeign(n); } // kept name for callers
 
 // derive lodging rows from itinerary: distinct hotel name -> nights (count of days with that hotel)
 function lodgingFromItinerary(){
@@ -1832,29 +1852,46 @@ function lodgingFromItinerary(){
   (state.days||[]).forEach(d=>{ const h=(d.hotel||'').trim(); if(!h) return; map.set(h,(map.get(h)||0)+1); });
   return Array.from(map,([hotel,nights])=>({hotel,nights}));
 }
-// persisted per-hotel inputs live in expense.lodge keyed by hotel name: {fee,cur,people}
 function lodgeMeta(){ if(!state.expense.lodge||typeof state.expense.lodge!=='object') state.expense.lodge={}; return state.expense.lodge; }
 
 function curToggle(cur,onChange){
   const w=document.createElement('span'); w.className='cur-toggle';
-  [['¥',CUR_JPY],['HK$',CUR_HKD]].forEach(([lab,val])=>{
+  [[foreignSym(),CUR_JPY],['HK$',CUR_HKD]].forEach(([lab,val])=>{
     const b=document.createElement('button'); b.textContent=lab; if(cur===val)b.classList.add('on');
     b.onclick=()=>onChange(val); w.appendChild(b);
   });
   return w;
 }
+// number input that does NOT rebuild the DOM on each keystroke (keeps focus).
+// on(value) updates the model; recalcExpense() refreshes computed labels in place.
 function numInput(val,ph,on){
-  const i=document.createElement('input'); i.type='number'; i.className='exp-amt'; i.step='0.01'; i.min='0';
-  i.inputMode='decimal'; i.placeholder=ph||'0'; if(val!==''&&val!=null&&!isNaN(val)) i.value=val;
-  i.oninput=()=>on(i.value); return i;
+  const i=document.createElement('input'); i.type='text'; i.className='exp-amt';
+  i.inputMode='decimal'; i.placeholder=ph||'0'; if(val!==''&&val!=null) i.value=val;
+  i.oninput=()=>{ // allow only number-ish chars
+    const cleaned=i.value.replace(/[^\d.]/g,''); if(cleaned!==i.value){ const p=i.selectionStart; i.value=cleaned; try{i.setSelectionRange(p-1,p-1);}catch(e){} }
+    on(i.value); recalcExpense();
+  };
+  return i;
+}
+
+// registry of computed labels to refresh in place (rebuilt each full render)
+let expRecalc=[];
+function recalcExpense(){ const rate=state.expense.rate||0; let grand=0;
+  expRecalc.forEach(fn=>{ const v=fn(rate); if(typeof v==='number') grand+=v; });
+  const g=document.getElementById('expGrand');
+  if(g) g.innerHTML='<span class="et-lab">全程總計</span><span><span class="et-val">'+fmtHKD(grand)+'</span></span>';
 }
 
 function renderExpense(){
   const rate=state.expense.rate||0;
+  expRecalc=[];
+  const sym=foreignSym();
+  // rate bar: editable foreign symbol + rate
+  document.getElementById('fxSym').value = sym;
   document.getElementById('fxRate').value = rate || '';
-  document.getElementById('rateHint').textContent = rate ? ('（例：¥1000 ≈ '+fmtHKD(1000*rate)+'）') : '請先輸入匯率';
+  document.getElementById('rateHint').textContent = rate ? ('（例：'+sym+'1000 ≈ '+fmtHKD(1000*rate)+'）') : '請先輸入匯率';
 
-  let grandHKD=0, grandJPYpart=0;
+  let grandHKD=0;
 
   // ---------- LODGING ----------
   const lodgeBox=document.getElementById('lodgeTable'); lodgeBox.innerHTML='';
@@ -1866,116 +1903,101 @@ function renderExpense(){
     e.textContent='「行程」頁未填住宿。每天第一行填酒店名，這裡就會自動列出並計晚數。';
     lodgeBox.appendChild(e);
   }
+  const lodgeSubEl=document.createElement('div');
   lodges.forEach(({hotel,nights})=>{
     if(!meta[hotel]) meta[hotel]={fee:'',cur:CUR_JPY,people:1};
     const m=meta[hotel];
     const card=document.createElement('div'); card.className='exp-card';
     const line=document.createElement('div'); line.className='exp-line';
-    // name (read-only, from itinerary) + nights
     const nm=document.createElement('div'); nm.className='exp-name ro'; nm.textContent=hotel+'　'+nights+' 晚';
     const tog=curToggle(m.cur,v=>{ m.cur=v; markDirty(); renderExpense(); });
-    const fee=numInput(m.fee,'住宿費',v=>{ m.fee=v; markDirty(); renderExpense(); });
+    const fee=numInput(m.fee,'住宿費',v=>{ m.fee=v; markDirty(); });
     const hkd=document.createElement('div'); hkd.className='exp-hkd';
-    const feeHKD=toHKD(m.fee,m.cur,rate); hkd.textContent=fmtHKD(feeHKD);
     const spacer=document.createElement('span');
     line.append(nm,tog,fee,hkd,spacer);
     card.appendChild(line);
-    // people + per-person-per-night
     const pair=document.createElement('div'); pair.className='exp-sub';
-    const pWrap=document.createElement('span');
-    pWrap.innerHTML='人數：';
-    const people=document.createElement('input'); people.type='number'; people.min='1'; people.step='1';
+    const pWrap=document.createElement('span'); pWrap.innerHTML='人數：';
+    const people=document.createElement('input'); people.type='text'; people.inputMode='numeric';
     people.style.cssText='width:52px;border:2px solid var(--line);border-radius:10px;padding:3px 7px;font-family:inherit;text-align:center;background:#fff';
     people.value=m.people||1;
-    people.oninput=()=>{ m.people=Math.max(1,parseInt(people.value)||1); markDirty(); renderExpense(); };
+    people.oninput=()=>{ const n=parseInt(people.value.replace(/[^\d]/g,''))||1; m.people=Math.max(1,n); markDirty(); recalcExpense(); };
     pWrap.appendChild(people);
-    const ppl=Math.max(1,m.people||1);
-    const perPN=feeHKD/ppl/Math.max(1,nights);
     const avg=document.createElement('span');
-    avg.innerHTML='每人每晚平均：<b>'+fmtHKD(perPN)+'</b>';
     pair.append(pWrap,avg);
     card.appendChild(pair);
     lodgeBox.appendChild(card);
-    lodgeSumHKD+=feeHKD;
+    // in-place recompute for this hotel
+    expRecalc.push((rt)=>{ const feeHKD=toHKD(m.fee,m.cur,rt); hkd.textContent=fmtHKD(feeHKD);
+      const ppl=Math.max(1,m.people||1); const perPN=feeHKD/ppl/Math.max(1,nights);
+      avg.innerHTML='每人每晚平均：<b>'+fmtHKD(perPN)+'</b>';
+      lodgeSumHKD+=feeHKD; return feeHKD; });
   });
   if(lodges.length){
-    const sub=document.createElement('div'); sub.className='exp-total'; sub.style.marginTop='10px'; sub.style.borderColor='var(--lav)';
-    sub.style.boxShadow='0 4px 12px rgba(169,143,212,.2)';
-    sub.innerHTML='<span class="et-lab" style="font-size:15px">住宿總計</span><span class="et-val" style="font-size:20px;color:var(--lav-d)">'+fmtHKD(lodgeSumHKD)+'</span>';
-    lodgeBox.appendChild(sub);
+    lodgeSubEl.className='exp-total'; lodgeSubEl.style.marginTop='10px'; lodgeSubEl.style.borderColor='var(--lav)';
+    lodgeSubEl.style.boxShadow='0 4px 12px rgba(169,143,212,.2)';
+    lodgeBox.appendChild(lodgeSubEl);
+    // subtotal recompute (runs after the per-hotel ones reset lodgeSumHKD)
+    expRecalc.unshift(()=>{ lodgeSumHKD=0; }); // reset at start of each recalc pass
+    expRecalc.push(()=>{ lodgeSubEl.innerHTML='<span class="et-lab" style="font-size:15px">住宿總計</span><span class="et-val" style="font-size:20px;color:var(--lav-d)">'+fmtHKD(lodgeSumHKD)+'</span>'; });
   }
-  grandHKD+=lodgeSumHKD;
 
   // ---------- OTHER ROWS ----------
   ensureDefaultExpenseRows();
   const box=document.getElementById('expTable'); box.innerHTML='';
-  state.expense.rows.forEach((row,idx)=>{
-    box.appendChild(expenseRowEl(row,idx,rate));
-    grandHKD+=expenseRowHKD(row,rate);
-  });
+  state.expense.rows.forEach((row,idx)=>{ box.appendChild(expenseRowEl(row,idx)); });
 
-  // ---------- GRAND TOTAL ----------
-  const g=document.getElementById('expGrand');
-  g.innerHTML='<span class="et-lab">全程總計</span><span><span class="et-val">'+fmtHKD(grandHKD)+'</span></span>';
-
+  // grand total element exists; recompute now
+  recalcExpense();
   autosizeSettled(document.getElementById('view-expense'));
 }
 
 // spent amount (in HKD) contributed by a row, honoring its "kind"
 function expenseRowHKD(row,rate){
-  if(row.kind==='balance'){ // cash / suica: initial - left = spent
-    const init=+row.init||0, left=+row.left||0;
-    const spent=Math.max(0,init-left);
-    return toHKD(spent,row.cur,rate);
-  }
+  if(row.kind==='balance'){ const init=+row.init||0, left=+row.left||0; return toHKD(Math.max(0,init-left),row.cur,rate); }
   return toHKD(row.amt,row.cur,rate);
 }
 
-function expenseRowEl(row,idx,rate){
+function expenseRowEl(row,idx){
   const card=document.createElement('div'); card.className='exp-card';
   const line=document.createElement('div'); line.className='exp-line';
-
-  // name: fixed rows are read-only label; custom rows editable
   let nameEl;
   if(row.fixed){ nameEl=document.createElement('div'); nameEl.className='exp-name ro'; nameEl.textContent=row.name; }
   else { nameEl=document.createElement('input'); nameEl.className='exp-name'; nameEl.value=row.name||''; nameEl.placeholder='項目名稱';
-    nameEl.oninput=()=>{ row.name=nameEl.value; markDirty(); updateGrandOnly(rate); }; }
-
+    nameEl.oninput=()=>{ row.name=nameEl.value; markDirty(); }; }
   const tog=curToggle(row.cur||CUR_JPY,v=>{ row.cur=v; markDirty(); renderExpense(); });
 
   if(row.kind==='balance'){
-    // single-line: name + currency + (spent shown) ; pair below for init/left
-    const spentHKD=expenseRowHKD(row,rate);
-    const hkd=document.createElement('div'); hkd.className='exp-hkd'; hkd.textContent=fmtHKD(spentHKD);
-    const spacerCell=document.createElement('span');
+    const hkd=document.createElement('div'); hkd.className='exp-hkd';
     const delCell = row.fixed ? document.createElement('span') : mkDel(idx);
     line.append(nameEl,tog,document.createElement('span'),hkd,delCell);
     card.appendChild(line);
-    // pair inputs
     const pair=document.createElement('div'); pair.className='exp-pair';
     const l1=document.createElement('label'); l1.textContent='初始';
-    const i1=numInput(row.init,'0',v=>{ row.init=v; markDirty(); renderExpense(); }); i1.style.width='100%';
+    const i1=numInput(row.init,'0',v=>{ row.init=v; markDirty(); }); i1.style.width='100%';
     const l2=document.createElement('label'); l2.textContent='剩餘';
-    const i2=numInput(row.left,'0',v=>{ row.left=v; markDirty(); renderExpense(); }); i2.style.width='100%';
+    const i2=numInput(row.left,'0',v=>{ row.left=v; markDirty(); }); i2.style.width='100%';
     pair.append(l1,i1,l2,i2);
     card.appendChild(pair);
     const sub=document.createElement('div'); sub.className='exp-sub';
-    const init=+row.init||0,left=+row.left||0;
-    sub.innerHTML='<span>用了：<b>'+(row.cur===CUR_JPY?fmtJPY(Math.max(0,init-left)):fmtHKD(Math.max(0,init-left)))+'</b></span><span>＝ <b>'+fmtHKD(spentHKD)+'</b></span>';
     card.appendChild(sub);
+    expRecalc.push((rt)=>{ const spentHKD=expenseRowHKD(row,rt); hkd.textContent=fmtHKD(spentHKD);
+      const init=+row.init||0,left=+row.left||0, spent=Math.max(0,init-left);
+      sub.innerHTML='<span>用了：<b>'+(row.cur===CUR_HKD?fmtHKD(spent):fmtForeign(spent))+'</b></span><span>＝ <b>'+fmtHKD(spentHKD)+'</b></span>';
+      return spentHKD; });
   } else {
-    const amt=numInput(row.amt,'金額',v=>{ row.amt=v; markDirty(); renderExpense(); });
-    const hkd=document.createElement('div'); hkd.className='exp-hkd'; hkd.textContent=fmtHKD(toHKD(row.amt,row.cur,rate));
+    const amt=numInput(row.amt,'金額',v=>{ row.amt=v; markDirty(); });
+    const hkd=document.createElement('div'); hkd.className='exp-hkd';
     const delCell = row.fixed ? document.createElement('span') : mkDel(idx);
     line.append(nameEl,tog,amt,hkd,delCell);
     card.appendChild(line);
+    expRecalc.push((rt)=>{ const v=toHKD(row.amt,row.cur,rt); hkd.textContent=fmtHKD(v); return v; });
   }
   return card;
 
   function mkDel(i){ const x=document.createElement('button'); x.className='exp-x'; x.textContent='✕'; x.title='刪除此項';
     x.onclick=()=>{ state.expense.rows.splice(i,1); markDirty(); renderExpense(); }; return x; }
 }
-function updateGrandOnly(rate){ /* light: recompute grand without full re-render is optional; keep simple */ }
 
 // default fixed rows: 機票 / 現金 / 信用卡 / 西瓜卡 — added once per trip
 function ensureDefaultExpenseRows(){
@@ -1990,7 +2012,9 @@ function ensureDefaultExpenseRows(){
   defaults.forEach(d=>{ if(!has(d.name)) state.expense.rows.push(d); });
   state.expense._seeded=true;
 }
-document.getElementById('fxRate').oninput=e=>{ state.expense.rate=parseFloat(e.target.value)||0; markDirty(); renderExpense(); };
+document.getElementById('fxRate').oninput=e=>{ state.expense.rate=parseFloat(String(e.target.value).replace(/[^\d.]/g,''))||0; markDirty(); recalcExpense();
+  const sym=foreignSym(); document.getElementById('rateHint').textContent = state.expense.rate ? ('（例：'+sym+'1000 ≈ '+fmtHKD(1000*state.expense.rate)+'）') : '請先輸入匯率'; };
+document.getElementById('fxSym').onchange=e=>{ state.expense.sym=(e.target.value||'').trim()||'¥'; markDirty(); renderExpense(); };
 document.getElementById('btnAddExp').onclick=()=>{ state.expense.rows.push({name:'',kind:'amount',fixed:false,cur:CUR_JPY,amt:''}); markDirty(); renderExpense(); };
 
 /* ============ tabs ============ */
@@ -2503,8 +2527,8 @@ function tutSteps(){ return [
   { sel:'.row.tut-focus .grip, .row:not(.mealrow) .grip, .row .grip', stage:'itin', title:'⑪ 左邊：上下拖調位置',
     body:'每行<b>左邊</b>呢個 ⠿ 手柄，可以<b>㩒住上下拖</b>，調整行程次序。',
     before:()=>{ tutRevealTools(false); tutFocusPlaceRow(); } },
-  { sel:'#btnMore, nav', stage:'itin', title:'⑫ 仲有更多分頁',
-    body:'撳右上角「⋯ 更多」會搵到：三餐、To Do、攜帶清單、消費計算（住宿自動帶入、雙貨幣）。慢慢試！' },
+  { sel:'nav .nav-full[data-view="expense"], #btnMore, nav', stage:'itin', title:'⑫ 仲有更多分頁',
+    body:'仲有三餐、To Do、攜帶清單、消費計算（住宿自動帶入、雙貨幣）。手機喺「⋯」搵到；電腦就喺上面直接見到。慢慢試！' },
   { center:true, stage:'itin', emoji:'✨', title:'搞掂！',
     body:'呢個示範行程留低咗畀你——可以直接改啲字變真行程，或者返總覽開一個新嘅。<br>想再睇教學，總覽有粒「📖 使用教學」。祝旅程愉快 💕' },
 ];}
@@ -2582,7 +2606,8 @@ function tutEnterDemoTrip(){
 
 function tutPositionTo(sel){
   const hole=document.getElementById('tutHole'), bubble=document.getElementById('tutBubble');
-  let el=null; if(sel){ for(const s of sel.split(',')){ el=document.querySelector(s.trim()); if(el && el.offsetParent!==null) break; el=document.querySelector(s.trim()); if(el) break; } }
+  let el=null; if(sel){ const cands=sel.split(',').map(s=>document.querySelector(s.trim())).filter(Boolean);
+    el = cands.find(e=>e.offsetParent!==null) || cands[0] || null; }
   if(!el){
     hole.style.opacity='0';
     bubble.classList.add('centered');
