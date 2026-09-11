@@ -90,6 +90,38 @@
   .toolbtn.save{background:var(--pink);color:#fff;border-color:var(--pink);font-weight:800;box-shadow:0 3px 0 var(--pink-d)}
   .toolbtn.save:hover{background:var(--pink-d)}
   .toolbtn.save.dirty{animation:pulse 1.4s ease-in-out infinite}
+
+  /* more menu */
+  .more-wrap{position:relative;display:inline-block}
+  .more-btn.active{background:var(--pink);color:#fff;border-color:var(--pink);box-shadow:0 3px 0 var(--pink-d)}
+  .more-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;background:#fff;border:2px solid var(--line);
+    border-radius:16px;box-shadow:0 14px 34px rgba(150,110,170,.3);padding:6px;min-width:170px;display:none}
+  .more-menu.open{display:block}
+  .mm-tab,.mm-act{display:block;width:100%;text-align:left;border:none;background:transparent;font-family:inherit;
+    font-size:14px;font-weight:700;color:var(--ink);padding:10px 12px;border-radius:11px;cursor:pointer}
+  .mm-tab:hover,.mm-act:hover{background:var(--accent-soft);color:var(--accent)}
+  .mm-act{color:var(--lav-d);font-weight:700}
+  .mm-sep{height:2px;background:var(--line);margin:5px 6px;border-radius:2px}
+
+  /* day-jump pill (bottom) */
+  .daypill{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:70;display:flex;align-items:center;
+    gap:2px;background:#fff;border-radius:24px;box-shadow:0 8px 24px rgba(150,110,170,.34);padding:5px}
+  .dp-arw{width:40px;height:40px;border:none;background:transparent;border-radius:50%;color:var(--pink-d);
+    font-size:20px;font-weight:800;cursor:pointer}
+  .dp-arw:hover{background:var(--hover)}
+  .dp-cur{border:none;background:transparent;cursor:pointer;font-family:inherit;padding:0 16px;color:var(--accent);
+    font-weight:800;font-size:14px;line-height:1.15;text-align:center;white-space:nowrap}
+  .dp-cur small{display:block;font-size:10px;color:var(--ink-soft);font-weight:600;white-space:nowrap}
+  .daypop-back{position:fixed;inset:0;z-index:80;background:rgba(107,91,142,.34);
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;padding:24px}
+  .daypop-back.open{display:flex}
+  .daypop-box{background:#fff;border-radius:20px;box-shadow:0 16px 44px rgba(120,90,150,.4);padding:16px;width:240px;max-height:74vh;overflow:auto}
+  .daypop-box h4{font-family:"Zen Maru Gothic","Noto Serif TC",serif;font-weight:900;color:var(--accent);font-size:15px;margin:2px 0 12px;text-align:center}
+  .daypop-box button{display:flex;justify-content:space-between;align-items:center;width:100%;border:none;background:var(--hover);
+    border-radius:12px;padding:11px 13px;margin-bottom:7px;font-family:inherit;font-size:14px;font-weight:800;color:var(--ink);cursor:pointer}
+  .daypop-box button.on{background:var(--pink);color:#fff}
+  .daypop-box button .d{color:var(--ink-soft);font-weight:600;font-size:12px}
+  .daypop-box button.on .d{color:#fff}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(58,107,95,.5)}50%{box-shadow:0 0 0 5px rgba(58,107,95,0)}}
 
   /* tabs */
@@ -121,8 +153,9 @@
   .day.collapsed{padding-bottom:0}
   .day-head{
     display:flex;align-items:center;gap:12px;
-    padding:12px 16px;
+    padding:12px 16px;min-width:0;
   }
+  .day-head > *{min-width:0}
   .day-badge{
     display:inline-flex;align-items:center;background:var(--pink);color:#fff;font-weight:800;
     font-size:14px;padding:7px 15px;border-radius:20px 5px 20px 5px;white-space:nowrap;
@@ -137,13 +170,13 @@
   .date-btn.empty{color:var(--ink-soft)}
   .date-hidden{position:absolute;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none}
   .hotel{
-    flex:1;border:2px dashed #ddc9ee;background:#faf4fd;border-radius:20px;
+    flex:1;min-width:0;width:100%;border:2px dashed #ddc9ee;background:#faf4fd;border-radius:20px;
     padding:6px 14px;font-size:12.5px;color:var(--ink);
   }
   .hotel::placeholder{color:var(--ink-soft)}
   .hotel:focus{outline:none;border-color:var(--lav);border-style:solid}
-  .hotel-wrap{flex:1;display:flex;align-items:center;gap:5px}
-  .hotel-wrap .hotel{flex:1}
+  .hotel-wrap{flex:1;min-width:0;display:flex;align-items:center;gap:5px}
+  .hotel-wrap .hotel{flex:1;min-width:0}
   .hotelmap{margin:0;flex:0 0 auto}
   .day-x{margin-left:auto;border:none;background:transparent;color:#d9c9ee;cursor:pointer;font-size:15px;padding:2px 6px;border-radius:8px}
   .day-x:hover{background:var(--red);color:var(--pink-d)}
@@ -241,6 +274,50 @@
   .link-add{border:2px dashed var(--line);background:transparent;color:var(--lav-d);cursor:pointer;
     font-size:12px;font-weight:700;border-radius:11px;padding:6px 12px;margin:2px 0 6px}
   .link-add:hover{border-color:var(--pink);color:var(--pink-d);background:var(--accent-soft)}
+  /* one-row entry: description + right field + buy + open + delete */
+  .link-entry{display:flex;gap:6px;align-items:center;margin:0 0 7px}
+  .link-name{flex:0 0 34%;min-width:0;border:2px solid var(--line);border-radius:10px;background:#fff;
+    font-family:inherit;font-size:12px;color:var(--ink);padding:6px 8px}
+  .link-name:focus{outline:none;border-color:var(--lav)}
+  .link-url{flex:1;min-width:0;border:2px solid var(--line);border-radius:10px;background:#fff;
+    font-family:inherit;font-size:12px;color:var(--ink);padding:6px 8px}
+  .link-url:focus{outline:none;border-color:var(--pink)}
+  .link-url.is-ro{background:var(--accent-soft);color:var(--accent);font-weight:700;cursor:pointer;border-style:dashed}
+  .icobtn.buy{color:var(--mint-d);border-color:#cceed6;box-shadow:0 2.5px 0 #d6f0e3}
+  .icobtn.buy:hover{background:var(--mint);color:#fff;border-color:var(--mint)}
+  .link-del{border:none;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:12px;
+    padding:4px 6px;border-radius:8px;flex:0 0 auto;font-weight:700}
+  .link-del:hover{background:var(--red);color:var(--red-b)}
+  /* souvenir picker menu */
+  .buy-menu{position:fixed;z-index:10060;background:#fff;border:2px solid var(--line);border-radius:14px;
+    box-shadow:0 14px 34px rgba(150,110,170,.32);padding:6px;max-height:50vh;overflow:auto}
+  .buy-menu-item{display:block;width:100%;text-align:left;border:none;background:transparent;font-family:inherit;
+    font-size:13px;color:var(--ink);padding:9px 10px;border-radius:9px;cursor:pointer}
+  .buy-menu-item:hover{background:var(--accent-soft);color:var(--accent)}
+  /* chip variants for image / souvenir */
+  .url-chip.chip-img{border-color:#e7d5ef;color:var(--lav-d)}
+  .url-chip.chip-img:hover{background:var(--lav);color:#fff;border-color:var(--lav)}
+  .url-chip.chip-buy{border-color:#cceed6;color:var(--mint-d)}
+  .url-chip.chip-buy:hover{background:var(--mint);color:#fff;border-color:var(--mint)}
+  /* souvenir popover */
+  .buypop-backdrop{position:fixed;inset:0;z-index:9997;background:rgba(107,91,142,.32);
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;padding:22px}
+  .buypop-backdrop.open{display:flex}
+  .buypop{width:100%;max-width:360px;max-height:80vh;overflow:auto;background:#fff;border:3px solid #fff;border-radius:22px;
+    box-shadow:0 18px 44px rgba(150,110,170,.36);padding:18px 18px 16px;position:relative;
+    animation:tutPop .28s cubic-bezier(.34,1.56,.64,1)}
+  .buypop-x{position:absolute;top:12px;right:14px;border:none;background:transparent;color:var(--ink-soft);
+    font-size:15px;font-weight:700;cursor:pointer;border-radius:9px;padding:3px 7px}
+  .buypop-x:hover{background:var(--hover);color:var(--ink)}
+  .buypop-head{font-family:"Zen Maru Gothic",serif;font-weight:900;color:var(--mint-d);font-size:14px;margin:0 0 12px}
+  .bp-title{font-weight:800;color:var(--ink);font-size:16px;margin-bottom:6px}
+  .bp-sub{font-size:13px;color:var(--ink-soft);line-height:1.6;margin-bottom:10px;white-space:pre-wrap}
+  .bp-imgs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .bp-imgs img{width:78px;height:78px;object-fit:cover;border-radius:12px;border:2px solid var(--line);cursor:zoom-in}
+  .bp-go{width:100%;border:2px solid var(--mint-d);background:#fff;color:var(--mint-d);font-family:inherit;
+    font-weight:800;font-size:13px;border-radius:12px;padding:9px;cursor:pointer}
+  .bp-go:hover{background:var(--mint);color:#fff}
+  .bp-empty{color:var(--ink-soft);font-size:13px;padding:6px 2px}
   .maplink{
     border:none;background:transparent;cursor:pointer;color:var(--lav-d);
     font-size:11px;padding:4px 8px;text-align:left;text-decoration:underline;
@@ -319,7 +396,7 @@
   .gfull{width:58px;height:58px;border:1px solid var(--line-soft);border-radius:6px;color:#b8b0a0;
     display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center}
 
-  .imgview{position:fixed;inset:0;background:rgba(20,18,14,.82);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out}
+  .imgview{position:fixed;inset:0;background:rgba(20,18,14,.82);display:none;align-items:center;justify-content:center;z-index:10050;cursor:zoom-out}
   .imgview.open{display:flex}
   .imgview img{max-width:86vw;max-height:88vh;border-radius:8px;cursor:default}
   .iv-nav{position:absolute;top:50%;transform:translateY(-50%);border:none;cursor:pointer;
@@ -445,7 +522,7 @@
   .day.collapsed .day-head{border-bottom:none;align-items:flex-start;flex-wrap:wrap}
   .day.collapsed .day-caret,.day.collapsed .day-badge{margin-top:1px}
 
-  footer{margin-top:30px}
+  footer{margin-top:30px;padding-bottom:76px}
 
   /* ---- interactive walkthrough (spotlight) ---- */
   #tutSpot{position:fixed;inset:0;z-index:9999;pointer-events:none}
@@ -610,6 +687,8 @@
     .exp-line .exp-x{position:absolute;right:8px;top:8px}
     .exp-card{position:relative}
     .exp-pair{grid-template-columns:auto 1fr;gap:6px}
+    /* collapsed day: flow drops to its own full-width line under the label */
+    .day.collapsed .day-flow{flex-basis:100%;width:100%;margin-top:6px;line-height:1.8}
   }
 </style>
 </head>
@@ -617,7 +696,7 @@
 <div class="wrap">
   <header>
     <h1>行程<span class="en">TRIP PLANNER</span></h1>
-    <span class="ver" id="verBadge">v4.7</span>
+    <span class="ver" id="verBadge">v5.3</span>
   </header>
 
   <!-- ===== LIBRARY (overview) ===== -->
@@ -637,18 +716,45 @@
   <nav>
     <button class="backbtn" id="btnBack" title="回行程總覽">‹ 總覽</button>
     <div class="tab active" data-view="itin">行程</div>
-    <div class="tab" data-view="meals">三餐</div>
     <div class="tab" data-view="buy">To Buy 手信</div>
-    <div class="tab" data-view="todo">To Do</div>
-    <div class="tab" data-view="carry">攜帶</div>
-    <div class="tab" data-view="expense">消費</div>
-    <div class="spacer"></div>
     <button class="toolbtn save" id="btnSave">儲存</button>
-    <button class="toolbtn" id="btnExportImg">匯出圖片</button>
-    <button class="toolbtn" id="btnExportPdf">匯出 PDF</button>
-    <button class="toolbtn" id="btnExport">匯出 HTML</button>
+    <div class="more-wrap">
+      <button class="toolbtn more-btn" id="btnMore">⋯ 更多</button>
+      <div class="more-menu" id="moreMenu">
+        <div class="mm-tab" data-view="meals">三餐</div>
+        <div class="mm-tab" data-view="todo">To Do</div>
+        <div class="mm-tab" data-view="carry">攜帶</div>
+        <div class="mm-tab" data-view="expense">消費</div>
+        <div class="mm-sep"></div>
+        <button class="mm-act" id="btnExportImg2">匯出圖片</button>
+        <button class="mm-act" id="btnExportPdf2">匯出 PDF</button>
+        <button class="mm-act" id="btnExport2">匯出 HTML</button>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <!-- hidden originals kept for existing handlers/tests -->
+    <div class="tab" data-view="meals" hidden></div>
+    <div class="tab" data-view="todo" hidden></div>
+    <div class="tab" data-view="carry" hidden></div>
+    <div class="tab" data-view="expense" hidden></div>
+    <button id="btnExportImg" hidden></button>
+    <button id="btnExportPdf" hidden></button>
+    <button id="btnExport" hidden></button>
     <input type="file" id="fileInput" accept=".html" hidden>
   </nav>
+
+  <!-- day jump pill (itinerary only) -->
+  <div class="daypill" id="dayPill" style="display:none">
+    <button class="dp-arw" id="dpPrev" title="上一日">‹</button>
+    <button class="dp-cur" id="dpCur"><span id="dpDay">Day 1</span><small id="dpDate"></small></button>
+    <button class="dp-arw" id="dpNext" title="下一日">›</button>
+  </div>
+  <div class="daypop-back" id="dayPop">
+    <div class="daypop-box">
+      <h4>跳去邊一日</h4>
+      <div id="dayPopList"></div>
+    </div>
+  </div>
 
   <div class="namebar">
     <input class="tripname-edit" id="tripNameEdit" placeholder="旅程名稱（例：東京 5 日）">
@@ -798,9 +904,18 @@
 
 <datalist id="linkPresets"></datalist>
 
+<!-- souvenir popover (from itinerary note cell) -->
+<div class="buypop-backdrop" id="buyPop">
+  <div class="buypop" role="dialog" aria-modal="true">
+    <button class="buypop-x" id="buyPopClose" title="關閉">✕</button>
+    <div class="buypop-head">🛒 呢站要買嘅手信</div>
+    <div class="buypop-body" id="buyPopBody"></div>
+  </div>
+</div>
+
 <script>
 /* ============ version ============ */
-const APP_VERSION = "4.7";
+const APP_VERSION = "5.3";
 const STORE_KEY = "tripPlannerTrips";
 document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
 
@@ -821,6 +936,8 @@ const SVG = {
   del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/></svg>',
   lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
   lockOn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none"/></svg>',
+  photo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5-5-7 7"/></svg>',
+  cart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 12.5a1 1 0 0 0 1 .8h8.7a1 1 0 0 0 1-.8L21 7H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>',
 };
 function statusSVG(s,size){
   size=size||18;
@@ -838,7 +955,7 @@ const MEAL_ICON_SVG={
 };
 
 // preset descriptions for note links (user can still type free text)
-const LINK_PRESETS=["路線","時刻表","折價券","行情 / 價目","集合地點","參考網頁","官網","預約 / 訂票","菜單","注意事項"];
+const LINK_PRESETS=["路線","時刻表","折價券","行程","價目","集合地點","參考網頁","官網","預約 / 訂票","菜單","注意事項"];
 
 let state = null;        // current trip being edited
 let currentId = null;    // id of trip in library (null = not yet saved)
@@ -1042,6 +1159,7 @@ function render(){
   });
   daysEl.querySelectorAll('textarea').forEach(autosize);
   autosizeSettled(document.getElementById('view-itin'));
+  if(typeof renderDayPill==='function') renderDayPill();
 }
 
 /* ---- date helpers ---- */
@@ -1135,46 +1253,93 @@ function rowEl(day,di,r,ri){
   const ntop=document.createElement('div'); ntop.className='place-top';
   const noteTa=ta(r.note,'備註 / 交通（幾點到幾點）',v=>{ r.note=v; });
   ntop.appendChild(noteTa);
-  const nPen=document.createElement('button'); nPen.className='icobtn pen'; nPen.title='編輯連結'; nPen.innerHTML=SVG.pen;
+  const nPen=document.createElement('button'); nPen.className='icobtn pen'; nPen.title='編輯連結／圖片／手信'; nPen.innerHTML=SVG.pen;
   const lpanel=document.createElement('div'); lpanel.className='note linkpanel'+(r.linkOpen?' open':'');
-  // always-visible strip: one chip per link that has a URL; label = its name (or 連結N)
   const openStrip=document.createElement('div'); openStrip.className='url-strip';
+
+  // entry type helpers
+  const entryType=lk=> lk.img ? 'img' : (lk.buyRef!=null ? 'buy' : 'link');
+  const buyLabel=idx=>{ const b=state.buy&&state.buy[idx]; if(!b) return '(已刪除手信)'; return (b.text||'').trim()||('手信 '+(idx+1)); };
+
+  // collapsed strip: a chip per entry that has content, icon depends on type
   const rebuildOpenStrip=()=>{
-    openStrip.innerHTML='';
-    let any=false;
+    openStrip.innerHTML=''; let any=false;
     r.links.forEach((lk,i)=>{
-      const u=normLink(lk.url); if(!u) return; any=true;
-      const label=(lk.name||'').trim()||('連結'+(i+1));
-      const chip=document.createElement('button'); chip.className='url-chip'; chip.title='開啟：'+label;
-      chip.innerHTML=SVG.globe+'<span>'+label.slice(0,10)+'</span>';
-      chip.onclick=()=>window.open(u,'_blank');
+      const t=entryType(lk);
+      let icon,label,onClick,cls='url-chip';
+      if(t==='img'){ if(!lk.img) return; icon=SVG.photo; label=(lk.name||'').trim()||('圖片'+(i+1)); onClick=()=>openImg([lk.img],0); cls+=' chip-img'; }
+      else if(t==='buy'){ icon=SVG.cart; label=buyLabel(lk.buyRef); onClick=()=>openBuyPopover(lk.buyRef); cls+=' chip-buy'; }
+      else { const u=normLink(lk.url); if(!u) return; icon=SVG.globe; label=(lk.name||'').trim()||('連結'+(i+1)); onClick=()=>window.open(u,'_blank'); }
+      any=true;
+      const chip=document.createElement('button'); chip.className=cls; chip.title=label;
+      chip.innerHTML=icon+'<span>'+label.slice(0,12)+'</span>'; chip.onclick=onClick;
       openStrip.appendChild(chip);
     });
     openStrip.style.display=any?'flex':'none';
   };
+
   const buildLines=()=>{
     lpanel.innerHTML='';
-    if(!r.links.length) r.links.push({name:'',url:''}); // default one empty entry
+    if(!r.links.length) r.links.push({name:'',url:''});
     r.links.forEach((lk,i)=>{
       const wrapL=document.createElement('div'); wrapL.className='link-entry';
-      // description (with datalist dropdown)
+
+      // LEFT: description (unchanged) — datalist of preset words
       const nameIn=document.createElement('input'); nameIn.className='link-name'; nameIn.setAttribute('list','linkPresets');
       nameIn.placeholder='描述（例：時刻表）'; nameIn.value=lk.name||'';
       nameIn.oninput=()=>{ lk.name=nameIn.value; rebuildOpenStrip(); };
-      // url
-      const urlIn=document.createElement('input'); urlIn.className='link-url'; urlIn.placeholder='🔗 貼連結'; urlIn.value=lk.url||'';
-      const openL=document.createElement('button'); openL.className='icobtn url'; openL.innerHTML=SVG.globe; openL.title='開啟此連結';
-      const syncOpenL=()=>{ openL.style.display=normLink(lk.url)?'':'none'; };
-      openL.onclick=()=>{ const u=normLink(lk.url); if(u) window.open(u,'_blank'); };
-      urlIn.oninput=()=>{ lk.url=urlIn.value; syncOpenL(); rebuildOpenStrip(); };
-      // delete this link
-      const delL=document.createElement('button'); delL.className='link-del'; delL.textContent='✕'; delL.title='刪除此連結';
-      delL.onclick=()=>{ r.links.splice(i,1); if(!r.links.length) r.links.push({name:'',url:''}); buildLines(); rebuildOpenStrip(); markDirty(); };
-      syncOpenL();
-      wrapL.append(nameIn,urlIn,openL,delL); lpanel.appendChild(wrapL);
+
+      // RIGHT: one field. Paste link = link; paste image = image. Shows a readonly note for image/buy.
+      const rightIn=document.createElement('input'); rightIn.className='link-url';
+      const setRightForType=()=>{
+        const tt=entryType(lk);
+        if(tt==='img'){ rightIn.value='（已貼圖片）'; rightIn.readOnly=true; rightIn.classList.add('is-ro'); }
+        else if(tt==='buy'){ rightIn.value='🛒 '+buyLabel(lk.buyRef); rightIn.readOnly=true; rightIn.classList.add('is-ro'); }
+        else { rightIn.value=lk.url||''; rightIn.readOnly=false; rightIn.classList.remove('is-ro'); rightIn.placeholder='🔗 貼連結（或貼上圖片）'; }
+      };
+      rightIn.oninput=()=>{ if(rightIn.readOnly) return; lk.url=rightIn.value; lk.img=null; lk.buyRef=null; syncOpen(); rebuildOpenStrip(); };
+      rightIn.addEventListener('paste',ev=>{
+        const imgs=clipboardImages(ev);
+        if(imgs.length){ ev.preventDefault();
+          fileToImgCompressed(imgs[0],data=>{ lk.img=data; lk.url=''; lk.buyRef=null; buildLines(); rebuildOpenStrip(); markDirty(); });
+        }
+      });
+      // clicking a readonly image field re-opens the image; buy field opens popover
+      rightIn.onclick=()=>{ const tt=entryType(lk); if(tt==='img'&&lk.img) openImg([lk.img],0); else if(tt==='buy'&&lk.buyRef!=null) openBuyPopover(lk.buyRef); };
+
+      // 🛒 souvenir picker button (opens a small menu of To Buy items)
+      const buyBtn=document.createElement('button'); buyBtn.className='icobtn buy'; buyBtn.title='連結手信'; buyBtn.innerHTML=SVG.cart;
+      buyBtn.onclick=()=>{
+        const list=state.buy||[];
+        if(!list.length){ alert('未有手信。先去「To Buy 手信」頁加項目，再返嚟連結。'); return; }
+        tutBuyMenu(buyBtn,list,(bi)=>{
+          lk.buyRef=bi; lk.url=''; lk.img=null; lk.name=buyLabel(bi); // description auto = souvenir name
+          buildLines(); rebuildOpenStrip(); markDirty();
+        });
+      };
+
+      // open button (varies by type)
+      const openL=document.createElement('button'); openL.className='icobtn url';
+      const syncOpen=()=>{
+        const tt=entryType(lk);
+        if(tt==='img'){ openL.innerHTML=SVG.photo; openL.title='睇圖'; openL.style.display=''; openL.onclick=()=>{ if(lk.img) openImg([lk.img],0); }; }
+        else if(tt==='buy'){ openL.innerHTML=SVG.cart; openL.title='睇手信'; openL.style.display=''; openL.onclick=()=>{ if(lk.buyRef!=null) openBuyPopover(lk.buyRef); }; }
+        else { openL.innerHTML=SVG.globe; openL.title='開啟此連結'; const u=normLink(lk.url); openL.style.display=u?'':'none'; openL.onclick=()=>{ const uu=normLink(lk.url); if(uu) window.open(uu,'_blank'); }; }
+      };
+
+      // clear-to-link (small ✕ inside field area) when image/buy, to revert
+      const delL=document.createElement('button'); delL.className='link-del'; delL.textContent='✕'; delL.title='刪除此項';
+      delL.onclick=()=>{
+        const hasData=(lk.name||'').trim()||(lk.url||'').trim()||lk.img||lk.buyRef!=null;
+        if(hasData){ const label=(lk.name||'').trim()||(lk.url||'').trim()||(lk.img?'圖片':buyLabel(lk.buyRef)); if(!confirm('刪除呢個項目？\n「'+String(label).slice(0,40)+'」')) return; }
+        r.links.splice(i,1); if(!r.links.length) r.links.push({name:'',url:''}); buildLines(); rebuildOpenStrip(); markDirty();
+      };
+
+      setRightForType(); syncOpen();
+      wrapL.append(nameIn,rightIn,buyBtn,openL,delL);
+      lpanel.appendChild(wrapL);
     });
-    // add-link button
-    const addBtn=document.createElement('button'); addBtn.className='link-add'; addBtn.textContent='＋ 新增連結';
+    const addBtn=document.createElement('button'); addBtn.className='link-add'; addBtn.textContent='＋ 新增項目';
     addBtn.onclick=()=>{ r.links.push({name:'',url:''}); buildLines(); markDirty(); };
     lpanel.appendChild(addBtn);
   };
@@ -1213,7 +1378,7 @@ function rowEl(day,di,r,ri){
   tools.append(dup);
   const rm=document.createElement('button'); rm.className='mini del'; rm.innerHTML=SVG.del;
   rm.title=isMeal?'刪除此餐（之後可加回）':'刪除此行';
-  const rowHasContent=()=> (r.time||'').trim()||(r.place||'').trim()||(r.note||'').trim()||(r.detail||'').trim()||(r.addr||'').trim()||(r.links&&r.links.some(l=>(l&&l.url||'').trim()))||(r.extra||'').trim();
+  const rowHasContent=()=> (r.time||'').trim()||(r.place||'').trim()||(r.note||'').trim()||(r.detail||'').trim()||(r.addr||'').trim()||(r.links&&r.links.some(l=>l&&((l.url||'').trim()||l.img||l.buyRef!=null)))||(r.extra||'').trim();
   rm.onclick=()=>{
     if(rowHasContent()){
       const label=(r.place||'').trim()|| (isMeal?({b:'早餐',l:'午餐',d:'晚餐'}[r.meal]):'這一行');
@@ -1333,6 +1498,21 @@ function pickImgs(it,arr,elId,withImg){
   f.click();
 }
 function fileToImg(file,cb){ const rd=new FileReader(); rd.onload=()=>cb(rd.result); rd.readAsDataURL(file); }
+// compress to keep localStorage small: max ~1000px, JPEG q0.72
+function fileToImgCompressed(file,cb,maxDim,quality){
+  maxDim=maxDim||1000; quality=quality||0.72;
+  const rd=new FileReader();
+  rd.onload=()=>{ const img=new Image(); img.onload=()=>{
+    let w=img.width,h=img.height;
+    if(w>h && w>maxDim){ h=Math.round(h*maxDim/w); w=maxDim; }
+    else if(h>maxDim){ w=Math.round(w*maxDim/h); h=maxDim; }
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    const cx=cv.getContext('2d'); cx.drawImage(img,0,0,w,h);
+    let out; try{ out=cv.toDataURL('image/jpeg',quality); }catch(e){ out=rd.result; }
+    cb(out);
+  }; img.onerror=()=>cb(rd.result); img.src=rd.result; };
+  rd.readAsDataURL(file);
+}
 function clipboardImages(ev){
   const items=(ev.clipboardData&&ev.clipboardData.items)||[];
   const files=[];
@@ -1360,6 +1540,45 @@ function showIv(){
   document.getElementById('ivCount').textContent=multi?(ivIdx+1)+' / '+ivImgs.length:'';
 }
 function closeIv(){ document.getElementById('imgView').classList.remove('open'); }
+// souvenir popover: show a To Buy item's text + images without leaving itinerary
+function openBuyPopover(idx){
+  const b=state.buy&&state.buy[idx];
+  const pop=document.getElementById('buyPop'), body=document.getElementById('buyPopBody');
+  body.innerHTML='';
+  if(!b){ body.innerHTML='<div class="bp-empty">呢項手信已經喺「To Buy」頁刪除咗。</div>'; }
+  else {
+    const h=document.createElement('div'); h.className='bp-title'; h.textContent=(b.text||'').trim()||'（未命名手信）'; body.appendChild(h);
+    if((b.sub||'').trim()){ const s=document.createElement('div'); s.className='bp-sub'; s.textContent=b.sub; body.appendChild(s); }
+    if(Array.isArray(b.imgs)&&b.imgs.length){
+      const g=document.createElement('div'); g.className='bp-imgs';
+      b.imgs.forEach((src,gi)=>{ const im=document.createElement('img'); im.src=src; im.onclick=()=>openImg(b.imgs,gi); g.appendChild(im); });
+      body.appendChild(g);
+    }
+    const go=document.createElement('button'); go.className='bp-go'; go.textContent='去 To Buy 頁睇 →';
+    go.onclick=()=>{ closeBuyPopover(); const t=document.querySelector('.tab[data-view="buy"]'); if(t) t.click(); };
+    body.appendChild(go);
+  }
+  pop.classList.add('open');
+}
+function closeBuyPopover(){ document.getElementById('buyPop').classList.remove('open'); }
+document.getElementById('buyPopClose').onclick=closeBuyPopover;
+document.getElementById('buyPop').addEventListener('click',e=>{ if(e.target.id==='buyPop') closeBuyPopover(); });
+// small floating menu of To Buy items, anchored near a button; cb(index)
+function tutBuyMenu(anchor,list,cb){
+  document.querySelectorAll('.buy-menu').forEach(m=>m.remove());
+  const menu=document.createElement('div'); menu.className='buy-menu';
+  list.forEach((b,bi)=>{ const it=document.createElement('button'); it.className='buy-menu-item';
+    it.textContent=(b.text||'').trim()||('手信 '+(bi+1)); it.onclick=()=>{ cb(bi); menu.remove(); }; menu.appendChild(it); });
+  document.body.appendChild(menu);
+  const r=anchor.getBoundingClientRect(); const mw=Math.min(220,window.innerWidth-16);
+  menu.style.width=mw+'px';
+  let left=Math.min(r.left, window.innerWidth-mw-8); left=Math.max(8,left);
+  menu.style.left=left+'px';
+  const below=r.bottom+6, mh=menu.offsetHeight;
+  menu.style.top=(below+mh<window.innerHeight? below : Math.max(8,r.top-6-mh))+'px';
+  const close=(e)=>{ if(!menu.contains(e.target)&&e.target!==anchor){ menu.remove(); document.removeEventListener('pointerdown',close,true); } };
+  setTimeout(()=>document.addEventListener('pointerdown',close,true),0);
+}
 document.getElementById('ivPrev').onclick=e=>{ e.stopPropagation(); ivIdx--; showIv(); };
 document.getElementById('ivNext').onclick=e=>{ e.stopPropagation(); ivIdx++; showIv(); };
 document.getElementById('imgViewImg').onclick=e=>e.stopPropagation();
@@ -1781,13 +2000,77 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   t.classList.add('active');
   const v=document.getElementById('view-'+t.dataset.view);
   v.classList.add('active');
-  // these depend on data edited elsewhere → refresh on open
   if(t.dataset.view==='carry') renderCarry();
   if(t.dataset.view==='expense') renderExpense();
-  // textareas measured 0-height while hidden — fix now that they're visible
+  // day-jump pill only on itinerary
+  const pill=document.getElementById('dayPill'); if(pill) pill.style.display = (t.dataset.view==='itin') ? 'flex':'none';
+  // reflect current section on the 更多 button
+  syncMoreLabel(t.dataset.view);
   requestAnimationFrame(()=>v.querySelectorAll('textarea').forEach(autosize));
   autosizeSettled(v);
+  closeMore();
 });
+
+/* ===== More menu (secondary tabs + export) ===== */
+function closeMore(){ const m=document.getElementById('moreMenu'); if(m) m.classList.remove('open'); }
+function syncMoreLabel(view){
+  const secondary={meals:'三餐',todo:'To Do',carry:'攜帶',expense:'消費'};
+  const btn=document.getElementById('btnMore');
+  if(!btn) return;
+  btn.classList.toggle('active', !!secondary[view]);
+  btn.textContent = secondary[view] ? (secondary[view]+' ▾') : '⋯ 更多';
+}
+(function initMore(){
+  const btn=document.getElementById('btnMore'), menu=document.getElementById('moreMenu');
+  if(!btn) return;
+  btn.onclick=(e)=>{ e.stopPropagation(); menu.classList.toggle('open'); };
+  document.addEventListener('click',e=>{ if(!menu.contains(e.target)&&e.target!==btn) closeMore(); });
+  // secondary tab items → forward to hidden real tabs
+  menu.querySelectorAll('.mm-tab').forEach(it=>{ it.onclick=()=>{ const real=document.querySelector('nav .tab[data-view="'+it.dataset.view+'"]'); if(real) real.click(); closeMore(); }; });
+  // export actions → forward to hidden real buttons
+  const fwd=(fromId,toId)=>{ const f=document.getElementById(fromId); if(f) f.onclick=()=>{ closeMore(); document.getElementById(toId).click(); }; };
+  fwd('btnExportImg2','btnExportImg'); fwd('btnExportPdf2','btnExportPdf'); fwd('btnExport2','btnExport');
+})();
+
+/* ===== day-jump pill ===== */
+let dayCur=0;
+function currentDayIndex(){
+  // best guess: first expanded day in view, else 0
+  return Math.min(dayCur, Math.max(0,(state.days||[]).length-1));
+}
+function gotoDay(i){
+  const days=state.days||[]; if(!days.length) return;
+  i=Math.max(0,Math.min(i,days.length-1)); dayCur=i;
+  renderDayPill();
+  // scroll the day card into view
+  const cards=document.querySelectorAll('#days .day');
+  if(cards[i]) cards[i].scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderDayPill(){
+  const days=state.days||[]; const pill=document.getElementById('dayPill'); if(!pill) return;
+  if(!days.length){ pill.style.display='none'; return; }
+  const i=currentDayIndex();
+  document.getElementById('dpDay').textContent='Day '+(i+1);
+  document.getElementById('dpDate').textContent = days[i].date ? fmtDate(days[i].date) : '';
+}
+(function initDayPill(){
+  const prev=document.getElementById('dpPrev'), next=document.getElementById('dpNext'), cur=document.getElementById('dpCur');
+  if(!prev) return;
+  prev.onclick=()=>gotoDay(currentDayIndex()-1);
+  next.onclick=()=>gotoDay(currentDayIndex()+1);
+  cur.onclick=()=>openDayPop();
+  const back=document.getElementById('dayPop');
+  back.addEventListener('click',e=>{ if(e.target.id==='dayPop') back.classList.remove('open'); });
+})();
+function openDayPop(){
+  const days=state.days||[]; const list=document.getElementById('dayPopList'); list.innerHTML='';
+  const ci=currentDayIndex();
+  days.forEach((d,i)=>{ const b=document.createElement('button'); if(i===ci)b.className='on';
+    b.innerHTML='<span>Day '+(i+1)+'</span><span class="d">'+(d.date?fmtDate(d.date):'—')+'</span>';
+    b.onclick=()=>{ document.getElementById('dayPop').classList.remove('open'); gotoDay(i); };
+    list.appendChild(b); });
+  document.getElementById('dayPop').classList.add('open');
+}
 
 /* ============ add buttons ============ */
 document.getElementById('btnAddDay').onclick=()=>{ const nd=blankDay(); const last=state.days[state.days.length-1]; if(last&&last.date) nd.date=addDays(last.date,1); state.days.push(nd); render(); renderMeals(); markDirty(); };
@@ -1832,7 +2115,9 @@ function renderLibrary(){
   grid.appendChild(add);
 }
 
-function showLibrary(){ edEl.style.display='none'; libEl.style.display='block'; window.scrollTo(0,0); renderLibrary(); }
+function showLibrary(){ edEl.style.display='none'; libEl.style.display='block'; window.scrollTo(0,0); renderLibrary();
+  const p=document.getElementById('dayPill'); if(p) p.style.display='none';
+  const m=document.getElementById('moreMenu'); if(m) m.classList.remove('open'); }
 function showEditor(){ libEl.style.display='none'; edEl.style.display='block'; }
 
 /* ============ new trip dialog (name + range calendar) ============ */
@@ -2218,8 +2503,8 @@ function tutSteps(){ return [
   { sel:'.row.tut-focus .grip, .row:not(.mealrow) .grip, .row .grip', stage:'itin', title:'⑪ 左邊：上下拖調位置',
     body:'每行<b>左邊</b>呢個 ⠿ 手柄，可以<b>㩒住上下拖</b>，調整行程次序。',
     before:()=>{ tutRevealTools(false); tutFocusPlaceRow(); } },
-  { sel:'nav .tab[data-view="expense"], nav', stage:'itin', title:'⑫ 仲有更多分頁',
-    body:'上面仲有三餐、To Buy／To Do、攜帶清單、消費計算（住宿自動帶入、雙貨幣）。慢慢試！' },
+  { sel:'#btnMore, nav', stage:'itin', title:'⑫ 仲有更多分頁',
+    body:'撳右上角「⋯ 更多」會搵到：三餐、To Do、攜帶清單、消費計算（住宿自動帶入、雙貨幣）。慢慢試！' },
   { center:true, stage:'itin', emoji:'✨', title:'搞掂！',
     body:'呢個示範行程留低咗畀你——可以直接改啲字變真行程，或者返總覽開一個新嘅。<br>想再睇教學，總覽有粒「📖 使用教學」。祝旅程愉快 💕' },
 ];}
