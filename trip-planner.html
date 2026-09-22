@@ -79,6 +79,103 @@
 
   /* namebar */
   .namebar{margin:16px 0 2px}
+
+  /* browse-mode control bar */
+  .browsebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:2px 0 10px}
+  .mode-switch{display:inline-flex;gap:6px}
+  .mode-btn{border:2px solid var(--line);background:#fff;color:var(--lav-d);font-family:inherit;font-weight:800;
+    font-size:13px;border-radius:13px;padding:7px 14px;cursor:pointer}
+  .mode-btn.on{background:var(--pink);color:#fff;border-color:var(--pink);box-shadow:0 3px 0 var(--pink-d)}
+  .col-toggles{display:none;align-items:center;gap:6px;flex-wrap:wrap}
+  .col-toggles.show{display:inline-flex}
+  .ct-lab{font-size:12px;font-weight:800;color:var(--ink-soft)}
+  .ctog{display:inline-flex;align-items:center;gap:5px;border:2px solid var(--line);background:#fff;color:var(--ink-soft);
+    border-radius:11px;padding:6px 10px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+  .ctog.on{background:var(--accent-soft);border-color:var(--pink);color:var(--accent)}
+  .ct-box{width:15px;height:15px;border-radius:5px;border:2px solid var(--line);display:inline-flex;align-items:center;
+    justify-content:center;font-size:9px;color:transparent}
+  .ctog.on .ct-box{background:var(--pink);border-color:var(--pink);color:#fff}
+
+  /* ===== BROWSE MODE: compact, read-only, no clickable icons ===== */
+  #view-itin.browse .legend{display:none}
+  #view-itin.browse .addday{display:none}
+  #view-itin.browse .row-tools,
+  #view-itin.browse .grip,
+  #view-itin.browse .icobtn,
+  #view-itin.browse .mapicon,
+  #view-itin.browse .url-strip,
+  #view-itin.browse .linkpanel,
+  #view-itin.browse .rowbar,
+  #view-itin.browse .copybtn,
+  #view-itin.browse .addrow,
+  #view-itin.browse .day-add,
+  #view-itin.browse .mealadd,
+  #view-itin.browse .row-add{display:none !important}
+  #view-itin.browse .row{grid-template-columns:minmax(44px,1fr) minmax(0,3fr) minmax(0,6fr)}
+  #view-itin.browse .row.c4{grid-template-columns:minmax(44px,1fr) minmax(0,3fr) minmax(0,6fr)}
+  #view-itin.browse .cell{padding:6px 9px !important;min-height:0 !important;border-right-color:transparent}
+  #view-itin.browse .cell.col-time{padding:6px 4px !important}
+  #view-itin.browse textarea{min-height:0 !important;pointer-events:none;resize:none;background:transparent !important;
+    border:none !important;padding:0 !important;font-size:13px;line-height:1.45}
+  #view-itin.browse .col-time textarea{font-size:12px}
+  #view-itin.browse .col-note textarea{font-size:12px;color:var(--ink-soft)}
+  #view-itin.browse .corner-mark{transform:scale(.82)}
+  #view-itin.browse .day{margin-bottom:10px}
+  #view-itin.browse .day-body .row{border-bottom:1px solid var(--line-soft)}
+  /* meal tag stays, but tighter */
+  #view-itin.browse .meal-tag{margin-bottom:2px}
+  /* hotel stays but non-interactive */
+  #view-itin.browse .hotel{pointer-events:none}
+  #view-itin.browse .date-btn{pointer-events:none}
+  #view-itin.browse .day-caret{}  /* keep collapse working */
+  /* column hiding by toggles */
+  #view-itin.browse[data-cols~="time"] .col-time{display:flex}
+  #view-itin.browse:not([data-cols~="time"]) .col-time{display:none}
+  #view-itin.browse:not([data-cols~="place"]) .col-place{display:none}
+  #view-itin.browse:not([data-cols~="note"]) .col-note{display:none}
+  /* recompute grid columns based on visible set */
+  #view-itin.browse[data-cols="time place note"] .row,#view-itin.browse[data-cols="time place note"] .row.c4{grid-template-columns:minmax(44px,1fr) minmax(0,3fr) minmax(0,6fr)}
+  #view-itin.browse[data-cols="place note"] .row,#view-itin.browse[data-cols="place note"] .row.c4{grid-template-columns:minmax(0,3fr) minmax(0,6fr)}
+  #view-itin.browse[data-cols="time place"] .row,#view-itin.browse[data-cols="time place"] .row.c4{grid-template-columns:minmax(44px,1fr) minmax(0,3fr)}
+  #view-itin.browse[data-cols="time note"] .row,#view-itin.browse[data-cols="time note"] .row.c4{grid-template-columns:minmax(44px,1fr) minmax(0,6fr)}
+  #view-itin.browse[data-cols="time"] .row,#view-itin.browse[data-cols="time"] .row.c4{grid-template-columns:1fr}
+  #view-itin.browse[data-cols="place"] .row,#view-itin.browse[data-cols="place"] .row.c4{grid-template-columns:1fr}
+  #view-itin.browse[data-cols="note"] .row,#view-itin.browse[data-cols="note"] .row.c4{grid-template-columns:1fr}
+  /* merged rows in browse mode: spans place+note when both shown, else 1 col; shows even if only 備註 is on */
+  #view-itin.browse .row.merged .col-place{grid-column:auto}
+  #view-itin.browse[data-cols="time place note"] .row.merged .col-place,
+  #view-itin.browse[data-cols="place note"] .row.merged .col-place{grid-column:span 2}
+  #view-itin.browse[data-cols~="note"] .row.merged .col-place{display:flex}
+  #view-itin.browse .arrowbtn{display:none !important}
+
+  /* ===== multi-day side by side (desktop) ===== */
+  body.wide .wrap{max-width:none;padding-left:14px;padding-right:14px}
+  #days{display:grid;grid-template-columns:repeat(var(--dpr,1),minmax(0,1fr));gap:16px;align-items:start}
+  #days .day{margin-bottom:0;min-width:0}
+  #view-itin.browse #days{gap:12px}
+  #btnAddDay{margin-top:18px}
+  .perrow{display:inline-flex;align-items:center;gap:5px;margin-left:auto}
+  .pr-btn{border:2px solid var(--line);background:#fff;color:var(--ink-soft);font-family:inherit;font-weight:800;
+    font-size:12.5px;border-radius:10px;min-width:34px;padding:6px 8px;cursor:pointer}
+  .pr-btn:hover{border-color:var(--lav)}
+  .pr-btn.on{background:var(--lav);border-color:var(--lav);color:#fff;box-shadow:0 3px 0 var(--lav-d)}
+  /* day head wraps (hotel drops to its own line) instead of squeezing, in narrow columns / phones */
+  #days .day-head{flex-wrap:wrap;row-gap:8px}
+  #days .hotel-wrap{flex:1 1 150px}
+
+  /* ===== swap two days ===== */
+  .day-swap{border:2px solid var(--line);background:#fff;color:var(--lav-d);font-family:inherit;font-weight:800;
+    font-size:13px;height:28px;border-radius:11px;padding:0 8px;cursor:pointer;flex:0 0 auto;white-space:nowrap}
+  .day-swap:hover{background:var(--lav);color:#fff;border-color:var(--lav)}
+  .day-swap.src{background:var(--pink);border-color:var(--pink);color:#fff;box-shadow:0 3px 0 var(--pink-d)}
+  .day-swap.tgt{border-color:var(--pink);border-style:dashed;color:var(--pink-d);background:var(--accent-soft)}
+  .day-swap.tgt:hover{background:var(--pink);color:#fff;border-style:solid}
+  .day.swap-src{box-shadow:0 0 0 3px var(--pink),0 8px 20px rgba(180,140,190,.16)}
+  .day.swapped{animation:swapFlash .9s ease-out}
+  @keyframes swapFlash{0%{box-shadow:0 0 0 5px var(--mint-d)}100%{box-shadow:0 0 0 0 rgba(107,191,158,0),0 8px 20px rgba(180,140,190,.16)}}
+  #view-itin.browse .day-swap{display:none}
+  @media (prefers-reduced-motion:reduce){ .day.swapped{animation:none} }
+
   .tripname-edit{width:100%;border:none;background:transparent;
     font-family:"Zen Maru Gothic","Noto Serif TC",serif;font-size:23px;color:var(--accent);font-weight:700;
     border-bottom:2px dashed var(--line);padding:4px 4px 6px;}
@@ -188,11 +285,13 @@
   /* grid rows */
   .rows{padding:8px 12px}
   .row{
-    display:grid;grid-template-columns:26px 90px 0.85fr 1.15fr;gap:0;
+    display:grid;grid-template-columns:26px minmax(58px,1fr) minmax(0,3fr) minmax(0,6fr);gap:0;
     border:3px solid #f2e6f7;border-radius:18px;margin:8px 0;background:#fff;
     position:relative;transition:box-shadow .12s;box-shadow:0 3px 0 #f0e4f7;
   }
-  .row.c4{grid-template-columns:26px 90px 0.85fr 1.15fr .8fr}
+  .row.c4{grid-template-columns:26px minmax(58px,1fr) minmax(0,3fr) minmax(0,6fr) minmax(0,2fr)}
+  /* merged row: 景點+備註 → one wide cell */
+  .row.merged .col-place{grid-column:span 2}
   .row.dragging{opacity:.4}
   .row.over{box-shadow:inset 0 4px 0 -1px var(--lav)}
   .row.over-below{box-shadow:inset 0 -4px 0 -1px var(--lav)}
@@ -343,7 +442,39 @@
   .mini.del{background:var(--pink)} .mini.del:hover{background:var(--pink-d)}
   .mini.lockbtn{background:#e7dcf6;color:var(--lav-d)} .mini.lockbtn:hover{background:var(--lav);color:#fff}
   .mini.lockbtn.on{background:var(--lav);color:#fff}
+  .mini.merge{background:var(--peach-d)} .mini.merge:hover{background:#c9924a}
+  .mini.merge.on{background:#fff;color:var(--peach-d);border:2px solid var(--peach-d)}
+  .icobtn.arrowbtn{color:var(--peach-d);border-color:#f6dfb0;box-shadow:0 2.5px 0 #f6e6c6;font-weight:900;font-size:15px;font-family:inherit}
+  .icobtn.arrowbtn:hover{background:var(--peach);color:#fff;border-color:var(--peach)}
   .mini.status{background:#fff;border:2px solid var(--line)}
+  /* ===== place cell: spots view + per-spot map pins (v5.8) ===== */
+  .col-place:not(.editing) .place-top > textarea{display:none}
+  .col-place.editing .spots{display:none}
+  .spots{flex:1;min-width:0;cursor:text;padding:5px 9px;border-radius:8px;font-size:13.5px;line-height:1.85;
+    display:flex;flex-wrap:wrap;align-items:center;min-height:32px;word-break:break-word}
+  .spots:hover{background:#fdf9ff}
+  .spots:focus{outline:2px solid var(--lav);outline-offset:-2px}
+  .spots-ph{color:#b9aecf}
+  .spot{display:inline-flex;align-items:center;gap:3px;min-width:0}
+  .spot-arrow{color:#b8a8d4;margin:0 6px}
+  .spot-pin{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;
+    border:2px solid;flex:0 0 auto;text-decoration:none;transition:transform .08s}
+  .spot-pin svg{width:13px;height:13px}
+  .spot-pin.has{background:var(--mint-d);border-color:var(--mint-d);color:#fff}
+  .spot-pin.byname{background:#fff;border-color:#cceed6;color:var(--mint-d)}
+  .spot-pin:hover{transform:scale(1.12)}
+  .row.st-bred .col-place .spots{font-weight:800;color:var(--red-b)}
+  .spot-addrs{padding:8px 8px 2px}
+  .spot-addrs-h{font-size:11.5px;font-weight:800;color:var(--ink-soft);margin:0 0 6px}
+  .spot-addrs-empty{font-size:12px;color:var(--ink-soft);margin-bottom:6px}
+  .spot-addr-line{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .spot-addr-name{flex:0 0 32%;min-width:0;font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .spot-addr-in{flex:1;min-width:0;border:2px solid var(--line);border-radius:10px;background:#fff;
+    font-family:inherit;font-size:12px;color:var(--ink);padding:6px 8px}
+  .spot-addr-in:focus{outline:none;border-color:var(--lav)}
+  #view-itin.browse .spots{pointer-events:none;padding:0;min-height:0;font-size:13px;line-height:1.45}
+  #view-itin.browse .spot-pin{display:none}
+  @media (prefers-reduced-motion:reduce){ .spot-pin{transition:none} }
   .mini.status svg{width:18px;height:18px}
 
   .addrow{
@@ -678,6 +809,9 @@
   @media(max-width:640px){
     .row,.row.c4{grid-template-columns:18px 70px 1fr}
     .row .cell.col-note{grid-column:2/-1;border-right:none;border-top:1px solid var(--line-soft)}
+    .row.merged .col-place{grid-column:auto}
+    #days{grid-template-columns:minmax(0,1fr)}
+    .perrow{display:none}
     .row.c4 .cell.col-extra{grid-column:2/-1;border-top:1px solid var(--line-soft)}
     header h1{font-size:22px}
     .tab{padding:8px 12px}
@@ -709,7 +843,7 @@
 <div class="wrap">
   <header>
     <h1>行程<span class="en">TRIP PLANNER</span></h1>
-    <span class="ver" id="verBadge">v5.5</span>
+    <span class="ver" id="verBadge">v5.8</span>
   </header>
 
   <!-- ===== LIBRARY (overview) ===== -->
@@ -776,6 +910,19 @@
 
   <!-- ITINERARY -->
   <section class="view active" id="view-itin">
+    <div class="browsebar">
+      <div class="mode-switch">
+        <button class="mode-btn on" id="modeEdit">✏️ 編輯</button>
+        <button class="mode-btn" id="modeBrowse">👁 瀏覽</button>
+      </div>
+      <div class="col-toggles" id="colToggles">
+        <span class="ct-lab">顯示</span>
+        <button class="ctog on" data-col="time"><span class="ct-box">✓</span>時間</button>
+        <button class="ctog on" data-col="place"><span class="ct-box">✓</span>景點</button>
+        <button class="ctog on" data-col="note"><span class="ct-box">✓</span>備註</button>
+      </div>
+      <div class="perrow" id="perRow"><span class="ct-lab">每行</span><span id="perRowBtns" style="display:inline-flex;gap:5px"></span><span class="ct-lab">日</span></div>
+    </div>
     <div class="legend">
       <span><span class="chip g"></span>綠 = 已決定</span>
       <span><span class="chip r"></span>紅 = 未定 / 要改</span>
@@ -932,7 +1079,7 @@
 
 <script>
 /* ============ version ============ */
-const APP_VERSION = "5.5";
+const APP_VERSION = "5.8";
 const STORE_KEY = "tripPlannerTrips";
 document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
 
@@ -954,6 +1101,8 @@ const SVG = {
   lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
   lockOn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none"/></svg>',
   photo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5-5-7 7"/></svg>',
+  merge:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M8 12h8"/><path d="M13.5 9.5 16 12l-2.5 2.5"/></svg>',
+  split:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M12 6v12"/></svg>',
   cart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 12.5a1 1 0 0 0 1 .8h8.7a1 1 0 0 0 1-.8L21 7H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>',
 };
 function statusSVG(s,size){
@@ -980,7 +1129,7 @@ let dirty = false;
 let pickedWish = null;    // index of wish item selected for assigning
 
 function uid(){ return 't'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
-function blankRow(){ return {time:"",place:"",note:"",extra:null,detail:"",detailOpen:false,addr:"",status:"",meal:null,mealStatus:"m-red",mealLock:false,links:[],linkOpen:false}; }
+function blankRow(){ return {time:"",place:"",note:"",extra:null,detail:"",detailOpen:false,addr:"",status:"",meal:null,mealStatus:"m-red",mealLock:false,links:[],linkOpen:false,merged:false,spotAddr:{}}; }
 function mealRow(slot){ const r=blankRow(); r.meal=slot; return r; }
 const MEAL_ORDER={b:0,l:1,d:2};
 function hasMeal(day,slot){ return day.rows.some(r=>r.meal===slot); }
@@ -1023,6 +1172,12 @@ function migrate(d){
     if(!Array.isArray(day.rows)) day.rows=[];
     day.rows.forEach(r=>{ if(r.meal===undefined)r.meal=null; if(r.mealStatus===undefined)r.mealStatus="m-red"; if(r.linkOpen===undefined)r.linkOpen=false;
       if(r.mealLock===undefined) r.mealLock=false;
+      if(r.merged===undefined) r.merged=false;
+      // v5.8: per-spot addresses. Old single r.addr → first spot of the place text.
+      if(!r.spotAddr||typeof r.spotAddr!=='object'){ r.spotAddr={};
+        const first=splitSpots(r.place)[0];
+        if((r.addr||'').trim() && first){ r.spotAddr[first]=r.addr; r.addr=''; }
+      }
       // new link model: links = [{name, url}]. Migrate from old per-line noteLinks[] or single link.
       if(!Array.isArray(r.links)){
         r.links=[];
@@ -1102,6 +1257,20 @@ function autosizeAll(){ document.querySelectorAll('#editor textarea').forEach(au
 let _resizeT=null;
 window.addEventListener('resize',()=>{ clearTimeout(_resizeT); _resizeT=setTimeout(()=>autosizeSettled(),120); });
 
+/* ---- swap two days' content (hotel + rows); date / Day label stay ---- */
+let swapFrom=null, swapFlash=null;
+function daySwapClick(di){
+  if(swapFrom===null){ swapFrom=di; render(); return; }
+  if(swapFrom===di){ swapFrom=null; render(); return; }
+  const a=state.days[swapFrom], b=state.days[di];
+  if(!a||!b){ swapFrom=null; render(); return; }
+  [a.hotel,b.hotel]=[b.hotel,a.hotel];
+  [a.rows,b.rows]=[b.rows,a.rows];
+  swapFlash=[swapFrom,di]; swapFrom=null;
+  render(); renderMeals(); markDirty();
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && swapFrom!==null){ swapFrom=null; render(); } });
+
 function render(){
   daysEl.innerHTML='';
   state.days.forEach((day,di)=>{
@@ -1112,6 +1281,11 @@ function render(){
     const badge=document.createElement('span'); badge.className='day-badge'; badge.textContent='Day '+(di+1);
     const date=dateField(day,di);
     head.append(caret,badge,date);
+    const sw=document.createElement('button'); sw.className='day-swap';
+    if(swapFrom===null){ sw.textContent='⇄'; sw.title='同另一日互換內容（日期不變）'; }
+    else if(swapFrom===di){ sw.classList.add('src'); sw.textContent='取消'; sw.title='取消互換'; d.classList.add('swap-src'); }
+    else { sw.classList.add('tgt'); sw.textContent='⇄ 同 Day '+(swapFrom+1)+' 換'; sw.title='將呢日同 Day '+(swapFrom+1)+' 嘅內容對調'; }
+    sw.onclick=()=>daySwapClick(di);
 
     if(day.collapsed){
       // collapsed: no hotel, show flow of the day (style B — wraps, shows all)
@@ -1139,7 +1313,7 @@ function render(){
       } else {
         flow.className='day-flow empty'; flow.textContent='（未填內容）';
       }
-      head.appendChild(flow);
+      head.append(flow,sw);
     } else {
       const hotelWrap=document.createElement('div'); hotelWrap.className='hotel-wrap';
       const hotel=inp('hotel',day.hotel,'🏨 今晚住宿…',v=>{day.hotel=v; hmap.disabled=!v.trim();});
@@ -1149,8 +1323,8 @@ function render(){
       hmap.onclick=()=>{ const q=(day.hotel||'').trim(); if(q) window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank'); };
       hotelWrap.append(hotel,hmap);
       const del=document.createElement('button'); del.className='day-x'; del.textContent='✕'; del.title='刪除這天';
-      del.onclick=()=>{ if(confirm('刪除 Day '+(di+1)+'？')){ state.days.splice(di,1); if(!state.days.length)state.days.push(blankDay()); render(); renderMeals(); } };
-      head.append(hotelWrap,del);
+      del.onclick=()=>{ if(confirm('刪除 Day '+(di+1)+'？')){ swapFrom=null; state.days.splice(di,1); if(!state.days.length)state.days.push(blankDay()); render(); renderMeals(); } };
+      head.append(hotelWrap,sw,del);
     }
     d.appendChild(head);
 
@@ -1173,12 +1347,63 @@ function render(){
       rows.appendChild(bar);
       d.appendChild(rows);
     }
+    if(swapFlash && swapFlash.includes(di)) d.classList.add('swapped');
     daysEl.appendChild(d);
   });
+  swapFlash=null;
   daysEl.querySelectorAll('textarea').forEach(autosize);
   autosizeSettled(document.getElementById('view-itin'));
   if(typeof renderDayPill==='function') renderDayPill();
+  if(typeof applyBrowse==='function') applyBrowse();
 }
+
+/* ============ browse mode (compact read-only view) ============ */
+const BROWSE_KEY='tripPlannerBrowsePref';
+function loadBrowsePref(){ try{ return JSON.parse(localStorage.getItem(BROWSE_KEY))||{}; }catch(e){ return {}; } }
+function saveBrowsePref(p){ try{ localStorage.setItem(BROWSE_KEY,JSON.stringify(p)); }catch(e){} }
+let browsePref=Object.assign({mode:'edit',cols:{time:true,place:true,note:true}}, loadBrowsePref());
+if(!browsePref.cols) browsePref.cols={time:true,place:true,note:true};
+const PERROW_OPTS={edit:[1,2,3],browse:[2,3,4]};
+if(!PERROW_OPTS.edit.includes(browsePref.perEdit)) browsePref.perEdit=2;
+if(!PERROW_OPTS.browse.includes(browsePref.perBrowse)) browsePref.perBrowse=2;
+function renderPerRow(isBrowse){
+  const box=document.getElementById('perRowBtns'); if(!box) return;
+  const key=isBrowse?'perBrowse':'perEdit', cur=browsePref[key];
+  box.innerHTML='';
+  PERROW_OPTS[isBrowse?'browse':'edit'].forEach(n=>{
+    const b=document.createElement('button'); b.className='pr-btn'+(n===cur?' on':''); b.textContent=n;
+    b.title='每行並排 '+n+' 日';
+    b.onclick=()=>{ browsePref[key]=n; saveBrowsePref(browsePref); applyBrowse(); autosizeSettled(document.getElementById('view-itin')); };
+    box.appendChild(b);
+  });
+  daysEl.style.setProperty('--dpr', cur);
+}
+function applyBrowse(){
+  const view=document.getElementById('view-itin'); if(!view) return;
+  const isBrowse=browsePref.mode==='browse';
+  view.classList.toggle('browse',isBrowse);
+  const me=document.getElementById('modeEdit'), mb=document.getElementById('modeBrowse');
+  if(me) me.classList.toggle('on',!isBrowse);
+  if(mb) mb.classList.toggle('on',isBrowse);
+  const ct=document.getElementById('colToggles'); if(ct) ct.classList.toggle('show',isBrowse);
+  document.querySelectorAll('#colToggles .ctog').forEach(b=>{ b.classList.toggle('on', !!browsePref.cols[b.dataset.col]); });
+  const order=['time','place','note'].filter(c=>browsePref.cols[c]);
+  view.setAttribute('data-cols', order.join(' '));
+  renderPerRow(isBrowse);
+  if(isBrowse) autosizeSettled(view);
+}
+(function initBrowse(){
+  const me=document.getElementById('modeEdit'), mb=document.getElementById('modeBrowse');
+  if(!me) return;
+  me.onclick=()=>{ browsePref.mode='edit'; saveBrowsePref(browsePref); applyBrowse(); render(); };
+  mb.onclick=()=>{ browsePref.mode='browse'; saveBrowsePref(browsePref); applyBrowse(); };
+  document.querySelectorAll('#colToggles .ctog').forEach(b=>b.onclick=()=>{
+    const on=[...document.querySelectorAll('#colToggles .ctog.on')];
+    if(b.classList.contains('on') && on.length<=1) return;
+    browsePref.cols[b.dataset.col]=!browsePref.cols[b.dataset.col];
+    saveBrowsePref(browsePref); applyBrowse();
+  });
+})();
 
 /* ---- date helpers ---- */
 const WEEK=["日","一","二","三","四","五","六"];
@@ -1211,6 +1436,9 @@ function dateField(day,di){
   return wrap;
 }
 
+// "A → B → C" → ["A","B","C"]  (also accepts -> and ＞)
+function splitSpots(t){ return String(t||'').split(/\s*(?:→|->|＞)\s*/).map(x=>x.trim()).filter(Boolean); }
+function mapsURL(q){ return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q); }
 function inp(cls,val,ph,on){
   const e=document.createElement('input'); e.className=cls; e.value=val||''; e.placeholder=ph;
   e.oninput=()=>on(e.value); return e;
@@ -1224,7 +1452,7 @@ function rowEl(day,di,r,ri){
   const isMeal=!!r.meal;
   const row=document.createElement('div');
   const statusCls = isMeal ? (r.mealStatus||'m-red') : (r.status||'');
-  row.className='row '+(isMeal?'mealrow ':'')+statusCls+(r.extra!==null?' c4':'')+(isMeal&&r.mealLock?' locked-meal':'');
+  row.className='row '+(isMeal?'mealrow ':'')+statusCls+(r.extra!==null?' c4':'')+(isMeal&&r.mealLock?' locked-meal':'')+(r.merged?' merged':'');
   row.draggable=false;
   const normLink=(u)=>{ u=(u||'').trim(); if(!u) return ''; return /^https?:\/\//i.test(u)?u:'https://'+u; };
 
@@ -1245,23 +1473,75 @@ function rowEl(day,di,r,ri){
   cTime.appendChild(ta(r.time,'時間',v=>r.time=v));
   row.appendChild(cTime);
 
-  // place cell = map only: text + pen(input addr) + pin(open, only when addr filled)
+  // place cell: "A → B → C" is split into spots; each spot has its own address + inline map pin.
+  // Display view (.spots) when idle; click/focus → textarea to edit. Address keyed by spot name (r.spotAddr).
+  if(!r.spotAddr||typeof r.spotAddr!=='object') r.spotAddr={};
   const cPlace=document.createElement('div'); cPlace.className='cell col-place';
   const top=document.createElement('div'); top.className='place-top';
-  top.appendChild(ta(r.place, isMeal?'餐廳 / 想食…':'景點 / 活動', v=>{ r.place=v; if(isMeal) renderMeals(); }));
-  const pinBtn=document.createElement('button'); pinBtn.className='icobtn map'; pinBtn.title='在 Google Maps 開啟'; pinBtn.innerHTML=SVG.pin;
-  pinBtn.onclick=()=>{ const q=(r.addr||'').trim(); if(q) window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank'); };
-  const penBtn=document.createElement('button'); penBtn.className='icobtn pen'; penBtn.title='填地址'; penBtn.innerHTML=SVG.pen;
-  const note=document.createElement('div'); note.className='note'+(r.detailOpen?' open':'');
-  const nt=ta(r.detail,'詳細備註…',v=>r.detail=v); note.appendChild(nt);
-  const addr=document.createElement('input'); addr.className='hotel'; addr.style.margin='0 8px 8px'; addr.style.width='calc(100% - 16px)';
-  addr.placeholder='📍 地址 / 地點名（填了才可開 Google Maps）'; addr.value=r.addr||'';
-  const syncPin=()=>{ pinBtn.style.display=(r.addr&&r.addr.trim())?'':'none'; };
-  addr.oninput=()=>{r.addr=addr.value; syncPin();};
-  note.append(addr);
-  penBtn.onclick=()=>{ r.detailOpen=!r.detailOpen; note.classList.toggle('open'); if(r.detailOpen){autosize(nt);addr.focus();} };
-  syncPin();
-  top.append(penBtn,pinBtn);
+  const placePh = r.merged ? (isMeal?'餐廳 A → B → C（合併格）':'景點 A → B → C（合併格）') : (isMeal?'餐廳 / 想食…':'景點 / 活動');
+  const spotsEl=document.createElement('div'); spotsEl.className='spots'; spotsEl.tabIndex=0; spotsEl.title='撳一下改文字（用 → 分隔景點）';
+  const note=document.createElement('div'); note.className='note spot-panel'+(r.detailOpen?' open':'');
+  const addrBox=document.createElement('div'); addrBox.className='spot-addrs';
+  const placeTa=ta(r.place, placePh, v=>{ r.place=v; if(isMeal) renderMeals(); if(r.detailOpen) buildAddrs(); });
+  const spotAddrOf=(name,i)=> (r.spotAddr[name]||'').trim() || (i===0 ? (r.addr||'').trim() : '');
+  const buildSpots=()=>{
+    spotsEl.innerHTML='';
+    const list=splitSpots(r.place);
+    if(!list.length){ const ph=document.createElement('span'); ph.className='spots-ph'; ph.textContent=placePh; spotsEl.appendChild(ph); return; }
+    list.forEach((name,i)=>{
+      if(i){ const a=document.createElement('span'); a.className='spot-arrow'; a.textContent='→'; spotsEl.appendChild(a); }
+      const sp=document.createElement('span'); sp.className='spot';
+      const tx=document.createElement('span'); tx.className='spot-name'; tx.textContent=name;
+      const ad=spotAddrOf(name,i);
+      const pin=document.createElement('a'); pin.className='spot-pin '+(ad?'has':'byname'); pin.innerHTML=SVG.pin;
+      pin.href=mapsURL(ad||name); pin.target='_blank'; pin.rel='noopener'; pin.tabIndex=-1;
+      pin.title=ad?('Google Maps：'+ad):('Google Maps 搜「'+name+'」');
+      pin.addEventListener('mousedown',e=>e.stopPropagation());
+      pin.onclick=e=>e.stopPropagation();
+      sp.append(tx,pin); spotsEl.appendChild(sp);
+    });
+  };
+  const buildAddrs=()=>{
+    addrBox.innerHTML='';
+    const h=document.createElement('div'); h.className='spot-addrs-h'; h.textContent='📍 每個景點嘅地址（可留空，留空就用景點名搜）'; addrBox.appendChild(h);
+    const list=splitSpots(r.place);
+    if(!list.length){ const e=document.createElement('div'); e.className='spot-addrs-empty'; e.textContent='先打景點名，多個景點用 → 分隔。'; addrBox.appendChild(e); return; }
+    list.forEach((name,i)=>{
+      const ln=document.createElement('div'); ln.className='spot-addr-line';
+      const nm=document.createElement('span'); nm.className='spot-addr-name'; nm.textContent=name; nm.title=name;
+      const inp=document.createElement('input'); inp.className='spot-addr-in'; inp.placeholder='地址 / 地點名';
+      inp.value=spotAddrOf(name,i); inp.setAttribute('aria-label',name+' 地址');
+      inp.oninput=()=>{ r.spotAddr[name]=inp.value; if(i===0 && r.addr) r.addr=''; buildSpots(); };
+      ln.append(nm,inp); addrBox.appendChild(ln);
+    });
+  };
+  const startEdit=()=>{
+    if(cPlace.classList.contains('editing')) return;
+    cPlace.classList.add('editing'); autosize(placeTa); placeTa.focus();
+    const L=placeTa.value.length; try{ placeTa.setSelectionRange(L,L); }catch(e){}
+  };
+  spotsEl.addEventListener('click',startEdit);
+  spotsEl.addEventListener('focus',startEdit);
+  placeTa.addEventListener('blur',()=>{ cPlace.classList.remove('editing'); buildSpots(); });
+  // quick "→" insert (voice / phone input can't type arrows easily) — every place cell
+  const arrowBtn=document.createElement('button'); arrowBtn.className='icobtn arrowbtn'; arrowBtn.textContent='→'; arrowBtn.title='喺游標位置加「→」（分隔景點）';
+  arrowBtn.addEventListener('mousedown',e=>e.preventDefault());
+  arrowBtn.onclick=()=>{
+    const editing=cPlace.classList.contains('editing');
+    if(!editing) startEdit();
+    const v=placeTa.value, pos=(editing && placeTa.selectionStart!=null)?placeTa.selectionStart:v.length;
+    const before=v.slice(0,pos).replace(/\s+$/,''), after=v.slice(pos).replace(/^\s+/,'');
+    const ins=before?' → ':'';
+    placeTa.value=before+ins+after; r.place=placeTa.value;
+    const caret=(before+ins).length; placeTa.focus(); try{ placeTa.setSelectionRange(caret,caret); }catch(e){}
+    autosize(placeTa); if(isMeal) renderMeals(); if(r.detailOpen) buildAddrs(); markDirty();
+  };
+  const penBtn=document.createElement('button'); penBtn.className='icobtn pen'; penBtn.title='填每個景點嘅地址／詳細備註'; penBtn.innerHTML=SVG.pen;
+  const nt=ta(r.detail,'詳細備註…',v=>r.detail=v);
+  note.append(addrBox,nt);
+  penBtn.onclick=()=>{ r.detailOpen=!r.detailOpen; note.classList.toggle('open',r.detailOpen); if(r.detailOpen){ buildAddrs(); autosize(nt); const f=addrBox.querySelector('input'); if(f) f.focus(); } };
+  buildSpots(); if(r.detailOpen) buildAddrs();
+  top.append(spotsEl,placeTa,arrowBtn,penBtn);
   cPlace.append(top,note);
   row.appendChild(cPlace);
 
@@ -1366,7 +1646,7 @@ function rowEl(day,di,r,ri){
   ntop.append(nPen);
   cNote.append(ntop,openStrip,lpanel);
   rebuildOpenStrip();
-  row.appendChild(cNote);
+  if(!r.merged) row.appendChild(cNote);   // merged row: note cell hidden (data kept)
 
   // optional 4th col
   if(r.extra!==null){
@@ -1391,12 +1671,23 @@ function rowEl(day,di,r,ri){
     lock.onclick=()=>{ r.mealLock=!r.mealLock; render(); renderMeals(); };
     tools.append(lock);
   }
+  const mg=document.createElement('button'); mg.className='mini merge'+(r.merged?' on':'');
+  mg.innerHTML=r.merged?SVG.split:SVG.merge;
+  mg.title=r.merged?'取消合併（分返景點／備註兩格）':'合併景點＋備註做一大格';
+  mg.onclick=()=>{
+    if(!r.merged){
+      const noteHas=(r.note||'').trim() || (r.links||[]).some(l=>l&&((l.url||'').trim()||l.img||l.buyRef!=null));
+      if(noteHas && !confirm('呢行嘅備註格有內容（文字／連結／圖片）。\n合併後會暫時收埋，取消合併就會返嚟。\n繼續合併？')) return;
+    }
+    r.merged=!r.merged; render(); markDirty();
+  };
+  tools.append(mg);
   const dup=document.createElement('button'); dup.className='mini dup'; dup.innerHTML=SVG.dup; dup.title='複製此行（貼在下面）';
   dup.onclick=()=>{ const copy=JSON.parse(JSON.stringify(r)); copy.meal=null; copy.mealStatus='m-red'; copy.mealLock=false; day.rows.splice(ri+1,0,copy); render(); if(isMeal)renderMeals(); markDirty(); };
   tools.append(dup);
   const rm=document.createElement('button'); rm.className='mini del'; rm.innerHTML=SVG.del;
   rm.title=isMeal?'刪除此餐（之後可加回）':'刪除此行';
-  const rowHasContent=()=> (r.time||'').trim()||(r.place||'').trim()||(r.note||'').trim()||(r.detail||'').trim()||(r.addr||'').trim()||(r.links&&r.links.some(l=>l&&((l.url||'').trim()||l.img||l.buyRef!=null)))||(r.extra||'').trim();
+  const rowHasContent=()=> (r.time||'').trim()||(r.place||'').trim()||(r.note||'').trim()||(r.detail||'').trim()||(r.addr||'').trim()||Object.values(r.spotAddr||{}).some(v=>(v||'').trim())||(r.links&&r.links.some(l=>l&&((l.url||'').trim()||l.img||l.buyRef!=null)))||(r.extra||'').trim();
   rm.onclick=()=>{
     if(rowHasContent()){
       const label=(r.place||'').trim()|| (isMeal?({b:'早餐',l:'午餐',d:'晚餐'}[r.meal]):'這一行');
@@ -2139,10 +2430,10 @@ function renderLibrary(){
   grid.appendChild(add);
 }
 
-function showLibrary(){ edEl.style.display='none'; libEl.style.display='block'; window.scrollTo(0,0); renderLibrary();
+function showLibrary(){ swapFrom=null; document.body.classList.remove('wide'); edEl.style.display='none'; libEl.style.display='block'; window.scrollTo(0,0); renderLibrary();
   const p=document.getElementById('dayPill'); if(p) p.style.display='none';
   const m=document.getElementById('moreMenu'); if(m) m.classList.remove('open'); }
-function showEditor(){ libEl.style.display='none'; edEl.style.display='block'; }
+function showEditor(){ libEl.style.display='none'; edEl.style.display='block'; document.body.classList.add('wide'); }
 
 /* ============ new trip dialog (name + range calendar) ============ */
 function isoOf(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
@@ -2274,7 +2565,7 @@ function renderDayCanvas(day, di, opts){
   const DPR=opts.dpr||2, W=opts.W||920, pad=28;
   const lh=22, rowPadY=8;
   const gx=pad, gw=W-pad*2;
-  const cTime=64, cPlace=Math.round((gw-cTime)*0.46), cNote=gw-cTime-cPlace;
+  const cTime=Math.max(64,Math.round(gw*0.1)), cPlace=Math.round(gw*0.3), cNote=gw-cTime-cPlace; // 1:3:6
   const meas=document.createElement('canvas').getContext('2d');
 
   // ---- measure height ----
@@ -2285,8 +2576,8 @@ function renderDayCanvas(day, di, opts){
   day.rows.forEach(r=>{
     const label=r.meal?({b:'早餐 ',l:'午餐 ',d:'晚餐 '}[r.meal]):'';
     const place=(label+(r.place||'')).trim();
-    const pl=expWrap(meas,place||'—',cPlace-16);
-    const nl=expWrap(meas,r.note||'',cNote-16);
+    const pl=expWrap(meas,place||'—',(r.merged?cPlace+cNote:cPlace)-16);
+    const nl=r.merged?[]:expWrap(meas,r.note||'',cNote-16);
     H+=Math.max(pl.length,nl.length,1)*lh+rowPadY*2+2;
   });
   H+=pad;
@@ -2320,8 +2611,8 @@ function renderDayCanvas(day, di, opts){
     const label=isMeal?({b:'早餐 ',l:'午餐 ',d:'晚餐 '}[r.meal]):'';
     const place=(label+(r.place||'')).trim()||'—';
     expSetF(ctx,EXP_FS.cell,false);
-    const pl=expWrap(ctx,place,cPlace-16);
-    const nl=expWrap(ctx,r.note||'',cNote-16);
+    const pl=expWrap(ctx,place,(r.merged?cPlace+cNote:cPlace)-16);
+    const nl=r.merged?[]:expWrap(ctx,r.note||'',cNote-16);
     const lines=Math.max(pl.length,nl.length,1);
     const rh=lines*lh+rowPadY*2;
     let bg=null;
@@ -2332,7 +2623,7 @@ function renderDayCanvas(day, di, opts){
     if(bg){ ctx.fillStyle=bg; roundRect(ctx,gx,y,gw,rh,6); ctx.fill(); }
     ctx.strokeStyle=EXP_COL.line; ctx.lineWidth=1.4; roundRect(ctx,gx,y,gw,rh,6); ctx.stroke();
     ctx.strokeStyle='#f0e8f6';
-    line(ctx,gx+cTime,y,gx+cTime,y+rh); line(ctx,gx+cTime+cPlace,y,gx+cTime+cPlace,y+rh);
+    line(ctx,gx+cTime,y,gx+cTime,y+rh); if(!r.merged) line(ctx,gx+cTime+cPlace,y,gx+cTime+cPlace,y+rh);
     // local-do marker
     if(status==='st-bred'){ ctx.fillStyle=EXP_COL.bred; ctx.beginPath(); ctx.arc(gx+cTime+cPlace+cNote-12,y+12,7,0,7); ctx.fill();
       ctx.fillStyle='#fff'; expSetF(ctx,11,true); ctx.fillText('!',gx+cTime+cPlace+cNote-15,y+5); }
@@ -2510,10 +2801,10 @@ function tutSteps(){ return [
   { sel:'.day .hotel-wrap .icobtn.map, .day .hotel-wrap .mapicon', stage:'itin', title:'⑤ 一撳開地圖',
     body:'填咗酒店名，右邊呢個地圖掣就會著起，撳落去 Google Maps 直接搜嗰間酒店。景點都一樣。' },
   { sel:'.row.tut-focus .col-place .icobtn.pen, .row .col-place .icobtn.pen', stage:'itin', title:'⑥ 景點入地址',
-    body:'景點格右邊個<b>筆</b>掣，撳咗可以入地址。我幫你填咗「淺草寺」同地址。',
+    body:'景點格可以打幾個景點，用 <b>→</b> 分隔（旁邊有「→」掣幫你加）。撳<b>筆</b>掣，每個景點都可以各自入地址。我幫你填咗「淺草寺」同地址。',
     before:()=>{ tutFillDemoPlace(); tutFocusPlaceRow(); } },
-  { sel:'.row.tut-focus .col-place .icobtn.map, .row .col-place .icobtn.map', stage:'itin', title:'⑦ 景點都開到地圖',
-    body:'入咗地址，景點格都會著起地圖掣，一撳去 Google Maps 導航。',
+  { sel:'.row.tut-focus .col-place .spot-pin, .row .col-place .spot-pin', stage:'itin', title:'⑦ 每個景點都有地圖',
+    body:'每個景點名後面都有地圖 icon：<b>實心綠</b>＝用你入嘅地址搜，<b>白底綠邊</b>＝未入地址，用景點名搜。一撳去 Google Maps。',
     before:()=>{ tutFocusPlaceRow(); } },
   { sel:'.row.tut-focus .col-note .icobtn.pen, .row .col-note .icobtn.pen', stage:'itin', title:'⑧ 第三格：自己加連結',
     body:'備註格（第三格）撳個<b>筆</b>掣，可以貼連結＋改描述：折價券 / QR、時刻表、參考網頁都得。我幫你加咗一條叫「折價券」。',
@@ -2543,10 +2834,10 @@ function tutFillDemoPlace(){
   const day=state.days[0]; if(!day) return;
   let r=day.rows.find(x=>!x.meal);
   if(!r){ // demo days are all meal rows — add a real place row after breakfast
-    r=blankRow(); r.place='淺草寺'; r.addr='東京都台東区浅草2-3-1'; r.time='10:00';
+    r=blankRow(); r.place='淺草寺'; r.spotAddr={'淺草寺':'東京都台東区浅草2-3-1'}; r.time='10:00';
     const bi=day.rows.findIndex(x=>x.meal==='b');
     day.rows.splice(bi>=0?bi+1:0,0,r);
-  } else { if(!r.place) r.place='淺草寺'; r.addr='東京都台東区浅草2-3-1'; if(!r.time) r.time='10:00'; }
+  } else { if(!r.place) r.place='淺草寺'; if(!r.spotAddr) r.spotAddr={}; r.spotAddr[splitSpots(r.place)[0]]='東京都台東区浅草2-3-1'; if(!r.time) r.time='10:00'; }
   render();
 }
 function tutShowDemoLink(){
