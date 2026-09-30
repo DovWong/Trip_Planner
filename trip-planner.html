@@ -979,6 +979,19 @@
     .spot-pin::after{content:'';position:absolute;inset:-9px}   /* bigger finger target, same look */
     .url-chip{padding-top:5px;padding-bottom:5px}
   }
+
+  /* v6.4 */
+  /* computer: narrow pages sit in the middle instead of hugging the left edge */
+  .listwrap{max-width:720px}
+  body.wide .listwrap{margin-left:auto;margin-right:auto}
+  body.wide .carry-wrap{max-width:1120px;margin-left:auto;margin-right:auto}
+  /* phone: 早/午/晚 labels stay put while the days scroll sideways */
+  @media(max-width:640px){
+    .meals-main{margin:0 -4px;padding:0 4px 6px;-webkit-overflow-scrolling:touch}
+    .meal-rowlabel,.meal-corner{position:sticky;left:0;z-index:3;background:rgba(243,235,248,.96);border-radius:8px}
+    .mcell-in{font-size:13px;padding:2px 6px 7px}
+    .mcell{min-height:76px}
+  }
 </style>
 </head>
 <body>
@@ -996,7 +1009,7 @@
 <div class="wrap">
   <header>
     <h1>行程<span class="en">TRIP PLANNER</span></h1>
-    <span class="ver" id="verBadge">v6.3</span>
+    <span class="ver" id="verBadge">v6.4</span>
   </header>
 
   <!-- ===== LIBRARY (overview) ===== -->
@@ -1261,7 +1274,7 @@
 
 <script>
 /* ============ version ============ */
-const APP_VERSION = "6.3";
+const APP_VERSION = "6.4";
 const STORE_KEY = "tripPlannerTrips";
 document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
 
@@ -1615,7 +1628,7 @@ function applyBrowse(){
   me.onclick=()=>{ setMode('edit'); applyBrowse(); render(); };
   mb.onclick=()=>{ setMode('browse'); applyBrowse(); };
   if(window.matchMedia){ const mq=window.matchMedia('(max-width:640px)');
-    const onChg=()=>{ if(document.getElementById('editor').style.display!=='none'){ applyBrowse(); render(); } };
+    const onChg=()=>{ if(document.getElementById('editor').style.display!=='none'){ applyBrowse(); render(); renderMeals(); } };
     if(mq.addEventListener) mq.addEventListener('change',onChg); else if(mq.addListener) mq.addListener(onChg); }
   document.querySelectorAll('#colToggles .ctog').forEach(b=>b.onclick=()=>{
     const on=[...document.querySelectorAll('#colToggles .ctog.on')];
@@ -2168,7 +2181,8 @@ function renderMeals(){
   const n=state.days.length;
   // fit up to ~10 days on desktop without horizontal scroll: shrink min width as days grow
   const minW = n<=10 ? 0 : 118; // 0 => equal fractions that can shrink; wider forces scroll on mobile
-  grid.style.gridTemplateColumns='40px repeat('+n+', minmax('+(minW||60)+'px,1fr))';
+  const phone=isPhoneW();
+  grid.style.gridTemplateColumns=(phone?'34px':'40px')+' repeat('+n+', minmax('+(phone?116:(minW||60))+'px,1fr))';
 
   grid.appendChild(cell('meal-corner',''));
   state.days.forEach((day,di)=>{
@@ -2236,6 +2250,7 @@ function renderMeals(){
   mealsDaysEl.appendChild(grid);
   document.addEventListener('mouseup',mealDragReset,{once:true});
   mealsDaysEl.querySelectorAll('textarea').forEach(autosize);
+  autosizeSettled(mealsDaysEl);   // re-fit once the grid has its real column widths
   renderMealSummary();
 }
 function mealDragReset(){ document.querySelectorAll('.mcell').forEach(c=>c.draggable=false); }
@@ -2601,7 +2616,7 @@ function syncMoreLabel(view){
 
 /* ===== bottom tab bar (phone) ===== */
 function syncTabBar(view){
-  document.querySelectorAll('#tabBar .tb-btn').forEach(b=>b.classList.toggle('on', b.dataset.view===view || (b.dataset.more && (view==='carry'||view==='expense'))));
+  document.querySelectorAll('#tabBar .tb-btn').forEach(b=>b.classList.toggle('on', !!(b.dataset.view===view || (b.dataset.more && (view==='carry'||view==='expense')))));
   const lab=document.getElementById('tbMoreLab'); if(lab) lab.textContent = view==='carry'?'攜帶':(view==='expense'?'消費':'更多');
   const sh=document.getElementById('tbSheet'); if(sh) sh.classList.remove('open');
 }
