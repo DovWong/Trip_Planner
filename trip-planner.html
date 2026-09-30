@@ -996,7 +996,7 @@
 <div class="wrap">
   <header>
     <h1>行程<span class="en">TRIP PLANNER</span></h1>
-    <span class="ver" id="verBadge">v6.2</span>
+    <span class="ver" id="verBadge">v6.3</span>
   </header>
 
   <!-- ===== LIBRARY (overview) ===== -->
@@ -1261,7 +1261,7 @@
 
 <script>
 /* ============ version ============ */
-const APP_VERSION = "6.2";
+const APP_VERSION = "6.3";
 const STORE_KEY = "tripPlannerTrips";
 document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
 
@@ -3722,7 +3722,22 @@ setInterval(()=>{ if(sbUser() && document.visibilityState==='visible' && !syncBu
 /* v6.0: offline + install (only when served from a real site, not a local file) */
 (function initPWA(){
   if(!/^https?:$/.test(location.protocol)) return;
-  if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+  if('serviceWorker' in navigator){
+    const hadController=!!navigator.serviceWorker.controller; let reloaded=false;
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+        reg.update().catch(()=>{});
+        // home-screen app often resumes instead of relaunching → check for a new version whenever it comes back
+        document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') reg.update().catch(()=>{}); });
+      }).catch(()=>{});
+    });
+    // a new version just took over → reload once so you see it (skipped if there are unsaved edits)
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(reloaded || !hadController) return;
+      if(typeof dirty!=='undefined' && dirty) return;
+      reloaded=true; location.reload();
+    });
+  }
   try{ if(navigator.storage && navigator.storage.persist && loadTrips().length) navigator.storage.persist().catch(()=>{}); }catch(e){}
 })();
 </script>
