@@ -556,15 +556,34 @@
   .gfull{width:58px;height:58px;border:1px solid var(--line-soft);border-radius:8px;color:#b4a8cc;
     display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center}
 
-  .imgview{position:fixed;inset:0;background:rgba(20,18,14,.82);display:none;align-items:center;justify-content:center;z-index:10050;cursor:zoom-out}
+  .imgview{position:fixed;inset:0;background:rgba(20,18,14,.86);display:none;align-items:center;justify-content:center;z-index:10050;cursor:zoom-out;
+    touch-action:none;overscroll-behavior:contain;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overflow:hidden}
   .imgview.open{display:flex}
-  .imgview img{max-width:86vw;max-height:88vh;border-radius:8px;cursor:default}
+  .imgview img{max-width:86vw;max-height:88vh;border-radius:8px;cursor:zoom-in;transform-origin:50% 50%;will-change:transform;
+    -webkit-user-drag:none;user-drag:none}
+  .imgview img.ease{transition:transform .22s ease}
+  .imgview.zoomed img{border-radius:0;cursor:grab}
+  .imgview.zoomed.panning img{cursor:grabbing}
+  .imgview.zoomed .iv-nav{opacity:0;pointer-events:none}
+  .iv-close{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;width:44px;height:44px;border:none;border-radius:50%;
+    background:rgba(255,255,255,.16);color:#fff;font-size:18px;cursor:pointer;z-index:2}
+  .iv-close:hover{background:rgba(255,255,255,.3)}
+  .iv-zoom{position:absolute;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:4px;
+    background:rgba(0,0,0,.42);border-radius:999px;padding:4px;z-index:2}
+  .iv-zoom button{border:none;background:transparent;color:#fff;font-family:inherit;font-weight:800;font-size:17px;min-width:36px;height:36px;
+    border-radius:999px;cursor:pointer;padding:0 8px}
+  .iv-zoom button:hover{background:rgba(255,255,255,.2)}
+  .iv-zoom #ivZoomPct{font-size:12px;min-width:52px;letter-spacing:.03em}
+  .iv-hint{position:absolute;top:calc(20px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);color:#fff;font-size:12.5px;
+    background:rgba(0,0,0,.45);padding:5px 14px;border-radius:999px;pointer-events:none;opacity:0;transition:opacity .4s;white-space:nowrap}
+  .iv-hint.show{opacity:1}
+  @media (hover:none){ .iv-zoom{display:none} }   /* phone: use your fingers */
   .iv-nav{position:absolute;top:50%;transform:translateY(-50%);border:none;cursor:pointer;
     background:rgba(255,255,255,.14);color:#fff;font-size:30px;line-height:1;width:52px;height:72px;
     border-radius:12px;display:flex;align-items:center;justify-content:center}
   .iv-nav:hover{background:rgba(255,255,255,.28)}
   .iv-prev{left:14px} .iv-next{right:14px}
-  .iv-count{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;
+  .iv-count{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);color:#fff;
     font-size:13.5px;background:rgba(0,0,0,.4);padding:4px 12px;border-radius:20px;letter-spacing:.1em}
   .gcell{cursor:grab}
   .gcell.gdragging{opacity:.4}
@@ -1009,7 +1028,7 @@
 <div class="wrap">
   <header>
     <h1>行程<span class="en">TRIP PLANNER</span></h1>
-    <span class="ver" id="verBadge">v6.4</span>
+    <span class="ver" id="verBadge">v6.5</span>
   </header>
 
   <!-- ===== LIBRARY (overview) ===== -->
@@ -1231,9 +1250,12 @@
 
 <div class="imgview" id="imgView">
   <button class="iv-nav iv-prev" id="ivPrev" title="上一張">‹</button>
-  <img id="imgViewImg" alt="">
+  <img id="imgViewImg" alt="" draggable="false">
   <button class="iv-nav iv-next" id="ivNext" title="下一張">›</button>
   <div class="iv-count" id="ivCount"></div>
+  <button class="iv-close" id="ivClose" title="關閉（Esc）" aria-label="關閉">✕</button>
+  <div class="iv-zoom"><button id="ivZoomOut" title="縮細（－）">－</button><button id="ivZoomPct" title="還原大小（0）">100%</button><button id="ivZoomIn" title="放大（＋）">＋</button></div>
+  <div class="iv-hint" id="ivHint">雙指放大縮小 · 撳兩下放大</div>
 </div>
 
 <!-- new trip dialog -->
@@ -1274,7 +1296,7 @@
 
 <script>
 /* ============ version ============ */
-const APP_VERSION = "6.4";
+const APP_VERSION = "6.5";
 const STORE_KEY = "tripPlannerTrips";
 document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
 
@@ -2102,9 +2124,11 @@ function openImg(imgs,idx){
   ivImgs = Array.isArray(imgs)? imgs : [imgs]; ivIdx = idx||0;
   showIv();
   document.getElementById('imgView').classList.add('open');
+  if(typeof ivShowHint==='function') ivShowHint();
 }
 function showIv(){
   if(!ivImgs.length) return;
+  if(typeof ivZoomReset==='function') ivZoomReset(false);
   if(ivIdx<0) ivIdx=ivImgs.length-1; if(ivIdx>=ivImgs.length) ivIdx=0;
   setImg(document.getElementById('imgViewImg'),ivImgs[ivIdx]);
   const multi=ivImgs.length>1;
@@ -2112,7 +2136,7 @@ function showIv(){
   document.getElementById('ivNext').style.display=multi?'':'none';
   document.getElementById('ivCount').textContent=multi?(ivIdx+1)+' / '+ivImgs.length:'';
 }
-function closeIv(){ document.getElementById('imgView').classList.remove('open'); }
+function closeIv(){ document.getElementById('imgView').classList.remove('open'); if(typeof ivZoomReset==='function') ivZoomReset(false); }
 // souvenir popover: show a To Buy item's text + images without leaving itinerary
 function openBuyPopover(idx){
   const b=state.buy&&state.buy[idx];
@@ -2154,20 +2178,115 @@ function tutBuyMenu(anchor,list,cb){
 }
 document.getElementById('ivPrev').onclick=e=>{ e.stopPropagation(); ivIdx--; showIv(); };
 document.getElementById('ivNext').onclick=e=>{ e.stopPropagation(); ivIdx++; showIv(); };
-document.getElementById('imgViewImg').onclick=e=>e.stopPropagation();
-document.getElementById('imgView').onclick=closeIv;
+document.getElementById('ivClose').onclick=e=>{ e.stopPropagation(); closeIv(); };
 document.addEventListener('keydown',e=>{
   if(!document.getElementById('imgView').classList.contains('open')) return;
   if(e.key==='ArrowLeft'){ ivIdx--; showIv(); }
   else if(e.key==='ArrowRight'){ ivIdx++; showIv(); }
   else if(e.key==='Escape'){ closeIv(); }
+  else if(e.key==='+'||e.key==='='){ ivZoomStep(1.5); }
+  else if(e.key==='-'||e.key==='_'){ ivZoomStep(1/1.5); }
+  else if(e.key==='0'){ ivZoomReset(true); }
 });
-// swipe on touch
-(function(){ let x0=null;
-  const v=document.getElementById('imgView');
-  v.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; },{passive:true});
-  v.addEventListener('touchend',e=>{ if(x0==null)return; const dx=e.changedTouches[0].clientX-x0;
-    if(Math.abs(dx)>40){ if(dx<0)ivIdx++; else ivIdx--; showIv(); } x0=null; });
+
+/* ===== v6.5 lightbox zoom: pinch (2 fingers) · drag when zoomed · double-tap · wheel / ＋－ on computer ===== */
+let ivZoomReset, ivZoomStep, ivShowHint;
+(function initIvZoom(){
+  const v=document.getElementById('imgView'), im=document.getElementById('imgViewImg');
+  const MAX=6, P=new Map();
+  let s=1, tx=0, ty=0, g=null, moved=false, downX=0, downY=0, downT=0, lastTap=0, lastX=0, lastY=0;
+  const ctr=()=>({x:window.innerWidth/2, y:window.innerHeight/2});
+  // size of the picture at 100% (its on-screen box divided by the current zoom)
+  // (offsetWidth/Height ignore the transform, so this is right even mid-animation or before the new zoom is drawn)
+  let shown=1;
+  const base=()=>{ if(im.offsetWidth) return {w:im.offsetWidth, h:im.offsetHeight};
+    const r=im.getBoundingClientRect(); return {w:r.width/shown, h:r.height/shown}; };
+  function clampPan(){
+    const b=base(), mx=Math.max(0,(b.w*s-window.innerWidth)/2), my=Math.max(0,(b.h*s-window.innerHeight)/2);
+    tx=Math.max(-mx,Math.min(mx,tx)); ty=Math.max(-my,Math.min(my,ty));
+  }
+  function apply(anim){
+    im.classList.toggle('ease',!!anim);
+    im.style.transform=(s===1&&!tx&&!ty)?'':'translate('+tx+'px,'+ty+'px) scale('+s+')'; shown=s;
+    v.classList.toggle('zoomed',s>1.01);
+    const pct=document.getElementById('ivZoomPct'); if(pct) pct.textContent=Math.round(s*100)+'%';
+  }
+  // zoom to ns keeping the picture point under (cx,cy) fixed on screen
+  function zoomAt(ns,cx,cy,anim){
+    ns=Math.max(1,Math.min(MAX,ns)); const c=ctr(), px=cx-c.x, py=cy-c.y;
+    tx=px-(px-tx)*(ns/s); ty=py-(py-ty)*(ns/s); s=ns;
+    if(s<=1.001){ s=1; tx=0; ty=0; }
+    clampPan(); apply(anim);
+  }
+  ivZoomReset=anim=>{ s=1; tx=0; ty=0; g=null; P.clear(); v.classList.remove('panning'); apply(anim); };
+  ivZoomStep=f=>{ const c=ctr(); zoomAt(s*f,c.x,c.y,true); };
+  let hintN=0; try{ hintN=+localStorage.getItem('tripPlannerZoomHint')||0; }catch(e){}
+  ivShowHint=()=>{
+    if(hintN>=4 || !(window.matchMedia && window.matchMedia('(hover:none)').matches)) return;
+    hintN++; try{ localStorage.setItem('tripPlannerZoomHint',String(hintN)); }catch(e){}
+    const h=document.getElementById('ivHint'); h.classList.add('show'); setTimeout(()=>h.classList.remove('show'),2600);
+  };
+  const onImg=(x,y)=>{ const r=im.getBoundingClientRect(); return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom; };
+  const two=()=>{ const a=[...P.values()]; return {d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)||1, x:(a[0].x+a[1].x)/2, y:(a[0].y+a[1].y)/2}; };
+  function startOne(pt){ g={type:s>1?'pan':'swipe', sx:pt.x, sy:pt.y, tx0:tx, ty0:ty}; v.classList.toggle('panning',s>1); }
+
+  v.addEventListener('pointerdown',e=>{
+    if(!v.classList.contains('open') || e.target.closest('button')) return;
+    P.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    try{ v.setPointerCapture(e.pointerId); }catch(_){}
+    if(P.size===1){ downX=e.clientX; downY=e.clientY; downT=Date.now(); moved=false; startOne({x:e.clientX,y:e.clientY}); }
+    else if(P.size===2){ const t=two(), c=ctr(); moved=true;
+      g={type:'pinch', d0:t.d, s0:s, mx0:t.x-c.x, my0:t.y-c.y, tx0:tx, ty0:ty}; }
+  });
+  v.addEventListener('pointermove',e=>{
+    if(!P.has(e.pointerId) || !g) return;
+    P.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(Math.hypot(e.clientX-downX,e.clientY-downY)>8) moved=true;
+    if(g.type==='pinch' && P.size>=2){
+      const t=two(), c=ctr(), mx=t.x-c.x, my=t.y-c.y;
+      const ns=Math.max(0.6,Math.min(MAX,g.s0*t.d/g.d0));             // a little give below 100%, snaps back on release
+      tx=mx-ns*(g.mx0-g.tx0)/g.s0; ty=my-ns*(g.my0-g.ty0)/g.s0; s=ns;  // the spot between your fingers stays put
+      apply(false); e.preventDefault();
+    } else if(g.type==='pan'){
+      tx=g.tx0+(e.clientX-g.sx); ty=g.ty0+(e.clientY-g.sy); clampPan(); apply(false); e.preventDefault();
+    }
+  });
+  function end(e){
+    if(!P.has(e.pointerId)) return;
+    P.delete(e.pointerId);
+    if(g && g.type==='pinch'){
+      if(P.size===1){ if(s<1){ s=1; tx=0; ty=0; } clampPan(); apply(true);
+        const pt=[...P.values()][0]; g={type:s>1?'pan':'none', sx:pt.x, sy:pt.y, tx0:tx, ty0:ty}; }   // leftover finger after a pinch: pan only, never swipe/tap
+      else if(P.size===0){ if(s<1.02){ s=1; tx=0; ty=0; } clampPan(); apply(true); g=null; v.classList.remove('panning'); }
+      return;
+    }
+    if(P.size) return;
+    const kind=g&&g.type; g=null; v.classList.remove('panning');
+    if(e.type==='pointercancel') return;
+    const dx=e.clientX-downX, dy=e.clientY-downY;
+    // swipe left / right = next / previous picture (only at 100%)
+    if(kind==='swipe' && s===1 && ivImgs.length>1 && Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.4){ ivIdx+=dx<0?1:-1; showIv(); return; }
+    if(moved || Date.now()-downT>450) return;
+    // a tap
+    const now=Date.now(), dbl=(now-lastTap<320 && Math.hypot(e.clientX-lastX,e.clientY-lastY)<36);
+    if(dbl){ lastTap=0; if(s>1) ivZoomReset(true); else zoomAt(2.5,e.clientX,e.clientY,true); return; }
+    lastTap=now; lastX=e.clientX; lastY=e.clientY;
+    if(s===1 && !onImg(e.clientX,e.clientY)) closeIv();   // tap the dark area = close (only when not zoomed)
+  }
+  v.addEventListener('pointerup',end);
+  v.addEventListener('pointercancel',end);
+  // computer: mouse wheel / trackpad pinch
+  v.addEventListener('wheel',e=>{
+    if(!v.classList.contains('open')) return; e.preventDefault();
+    zoomAt(s*Math.exp(-e.deltaY*(e.ctrlKey?0.01:0.0018)),e.clientX,e.clientY,false);
+  },{passive:false});
+  // Safari's own page pinch must not fight ours
+  ['gesturestart','gesturechange'].forEach(t=>v.addEventListener(t,e=>e.preventDefault()));
+  v.addEventListener('dragstart',e=>e.preventDefault());
+  document.getElementById('ivZoomIn').onclick=e=>{ e.stopPropagation(); ivZoomStep(1.5); };
+  document.getElementById('ivZoomOut').onclick=e=>{ e.stopPropagation(); ivZoomStep(1/1.5); };
+  document.getElementById('ivZoomPct').onclick=e=>{ e.stopPropagation(); ivZoomReset(true); };
+  window.addEventListener('resize',()=>{ if(v.classList.contains('open')){ clampPan(); apply(false); } });
 })();
 
 /* ============ meals + wishlist ============ */
