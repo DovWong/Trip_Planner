@@ -1011,6 +1011,19 @@
     .mcell-in{font-size:13px;padding:2px 6px 7px}
     .mcell{min-height:76px}
   }
+
+  /* v6.6 touch drag */
+  .grip,.mcell-grip,.wgrip{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  @media (hover:none){
+    .grip:not(.locked),.mcell-grip,.wgrip{touch-action:none}
+    .mcell-grip{font-size:15px;padding:4px 6px;top:-2px;right:0}
+    .wgrip{font-size:17px;padding:2px 6px 6px 2px}
+    .gcell img{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+  }
+  body.tdragging,body.tdragging *{-webkit-user-select:none !important;user-select:none !important}
+  .tdrag-ghost{position:fixed;z-index:10040;pointer-events:none;opacity:.92;margin:0;
+    box-shadow:0 14px 34px rgba(120,90,150,.38);transform-origin:50% 50%;transition:none}
+  .gcell.tlong img{transform:scale(1.08);transition:transform .15s}
 </style>
 </head>
 <body>
@@ -1028,7 +1041,7 @@
 <div class="wrap">
   <header>
     <h1>行程<span class="en">TRIP PLANNER</span></h1>
-    <span class="ver" id="verBadge">v6.5</span>
+    <span class="ver" id="verBadge">v6.6</span>
   </header>
 
   <!-- ===== LIBRARY (overview) ===== -->
@@ -1296,7 +1309,7 @@
 
 <script>
 /* ============ version ============ */
-const APP_VERSION = "6.5";
+const APP_VERSION = "6.6";
 const STORE_KEY = "tripPlannerTrips";
 document.getElementById('verBadge').textContent = 'v'+APP_VERSION;
 
@@ -1957,7 +1970,6 @@ function rowEl(day,di,r,ri){
   const locked = isMeal && r.mealLock;
   if(locked){ grip.classList.add('locked'); grip.innerHTML=SVG.lockOn; grip.title='已鎖定，不能移動'; }
   grip.addEventListener('mousedown',()=>{ if(!locked) row.draggable=true; });
-  grip.addEventListener('touchstart',()=>{ if(!locked) row.draggable=true; },{passive:true});
   document.addEventListener('mouseup',()=>{ row.draggable=false; });
   row.addEventListener('dragstart',e=>{ if(locked){e.preventDefault();return;} dragSrc={di,ri}; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
   row.addEventListener('dragend',()=>{ row.draggable=false; row.classList.remove('dragging'); document.querySelectorAll('.row.over,.row.over-below').forEach(x=>{x.classList.remove('over');x.classList.remove('over-below');}); });
@@ -2024,7 +2036,7 @@ function renderList(arr,elId,withImg){
       if(!Array.isArray(it.imgs)) it.imgs=[];
       const gal=document.createElement('div'); gal.className='gallery';
       it.imgs.forEach((src,gi)=>{
-        const cell=document.createElement('div'); cell.className='gcell'; cell.draggable=true;
+        const cell=document.createElement('div'); cell.className='gcell'; cell.draggable=!isTouchUI();
         const im=document.createElement('img'); setImg(im,src); im.title='點擊放大 · 可拖拉調位置';
         im.onclick=()=>openImg(it.imgs,gi);
         const x=document.createElement('button'); x.className='gdel'; x.textContent='✕'; x.title='移除這張圖';
@@ -2289,6 +2301,113 @@ let ivZoomReset, ivZoomStep, ivShowHint;
   window.addEventListener('resize',()=>{ if(v.classList.contains('open')){ clampPan(); apply(false); } });
 })();
 
+
+/* ===== v6.6 touch drag (iPhone / Android) =====
+   iOS doesn't run normal web drag-and-drop with a finger (holding the handle selects text instead).
+   This turns a finger drag on a handle into the same dragstart / dragover / drop events the
+   computer version already handles, so every drop rule stays in one place.
+   Handles: ⠿ on itinerary rows, ⠿ on meal cells, ⠿ on 想食清單 (start at once);
+            gallery pictures in 買嘢 / To Do (hold ~0.35s first, so a tap still opens the picture). */
+function isTouchUI(){ return !!(window.matchMedia && window.matchMedia('(hover:none)').matches); }
+(function initTouchDrag(){
+  const HANDLES=[
+    {h:'.grip:not(.locked)', src:'.row',   tgt:'.row'},
+    {h:'.mcell-grip',        src:'.mcell', tgt:'.mcell'},
+    {h:'.wgrip',             src:'.witem', tgt:'.mcell'},
+    {h:'.gcell img',         src:'.gcell', tgt:'.gcell', hold:350},
+  ];
+  let D=null, pend=null, raf=0;
+  const fakeDT=()=>({effectAllowed:'all',dropEffect:'move',types:[],setData(){},getData(){return '';},setDragImage(){},clearData(){}});
+  function fire(el,type,x,y){
+    if(!el) return false;
+    const e=new Event(type,{bubbles:true,cancelable:true});
+    Object.defineProperty(e,'dataTransfer',{value:fakeDT()});
+    Object.defineProperty(e,'clientX',{value:x}); Object.defineProperty(e,'clientY',{value:y});
+    el.dispatchEvent(e); return e.defaultPrevented;
+  }
+  function hit(x,y){
+    if(D.ghost) D.ghost.style.display='none';
+    const el=document.elementFromPoint(x,y);
+    if(D.ghost) D.ghost.style.display='';
+    const t=el && el.closest(D.cfg.tgt);
+    return (t && t!==D.src) ? t : null;
+  }
+  function begin(cfg,src,t){
+    const r=src.getBoundingClientRect();
+    D={cfg,src,x0:t.clientX,y0:t.clientY,x:t.clientX,y:t.clientY,over:null,ok:false,gx:r.left,gy:r.top};
+    try{ const sel=window.getSelection&&window.getSelection(); if(sel) sel.removeAllRanges(); }catch(e){}
+    if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    document.body.classList.add('tdragging');
+    fire(src,'dragstart',t.clientX,t.clientY);
+    const g=src.cloneNode(true); g.classList.add('tdrag-ghost'); g.removeAttribute('id');
+    g.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
+    g.style.left=r.left+'px'; g.style.top=r.top+'px'; g.style.width=r.width+'px'; g.style.height=r.height+'px';
+    document.body.appendChild(g); D.ghost=g;
+    move(t.clientX,t.clientY);
+    raf=requestAnimationFrame(autoScroll);
+  }
+  function move(x,y){
+    D.x=x; D.y=y;
+    D.ghost.style.transform='translate('+(x-D.x0)+'px,'+(y-D.y0)+'px) scale(1.03)';
+    const t=hit(x,y);
+    if(t!==D.over){ if(D.over) fire(D.over,'dragleave',x,y); D.over=t; }
+    D.ok = t ? fire(t,'dragover',x,y) : false;   // a target says "yes" by cancelling dragover, same as on computer
+  }
+  function finish(cancel){
+    cancelAnimationFrame(raf);
+    const d=D; D=null; if(!d) return;
+    if(d.ghost) d.ghost.remove();
+    document.body.classList.remove('tdragging');
+    if(!cancel && d.over && d.ok) fire(d.over,'drop',d.x,d.y);
+    else if(d.over) fire(d.over,'dragleave',d.x,d.y);
+    fire(d.src,'dragend',d.x,d.y);
+  }
+  // keep scrolling while the finger rests near an edge (page up/down; meals table sideways)
+  function autoScroll(){
+    if(!D) return;
+    const H=window.innerHeight, W=window.innerWidth, edge=70, bottom=H-120;   // bottom tab bar
+    let dy=0; if(D.y<edge+40) dy=-Math.ceil((edge+40-D.y)/6); else if(D.y>bottom) dy=Math.ceil((D.y-bottom)/6);
+    if(dy) window.scrollBy(0,Math.max(-18,Math.min(18,dy)));
+    const box=D.src.closest('.meals-main');
+    if(box){ let dx=0; if(D.x<50) dx=-10; else if(D.x>W-50) dx=10; if(dx) box.scrollLeft+=dx; }
+    if(dy || box) move(D.x,D.y);
+    raf=requestAnimationFrame(autoScroll);
+  }
+  document.addEventListener('touchstart',e=>{
+    if(D || e.touches.length!==1) { if(pend){ clearTimeout(pend.timer); pend=null; } return; }
+    const t=e.touches[0], el=e.target;
+    for(const cfg of HANDLES){
+      const h=el.closest && el.closest(cfg.h); if(!h) continue;
+      const src=h.closest(cfg.src); if(!src) return;
+      if(src.closest('#view-itin.browse')) return;          // 瀏覽模式唔拖
+      if(cfg.hold){                                          // pictures: hold first, a quick tap still opens it
+        pend={cfg,src,x:t.clientX,y:t.clientY,timer:setTimeout(()=>{
+          if(!pend) return; const p=pend; pend=null; p.src.classList.add('tlong');
+          begin(p.cfg,p.src,{clientX:p.x,clientY:p.y}); },cfg.hold)};
+        return;
+      }
+      e.preventDefault();                                    // no text selection / magnifier on the handle
+      begin(cfg,src,t); return;
+    }
+  },{passive:false});
+  document.addEventListener('touchmove',e=>{
+    const t=e.touches[0];
+    if(pend){ if(Math.hypot(t.clientX-pend.x,t.clientY-pend.y)>10){ clearTimeout(pend.timer); pend=null; } return; }
+    if(!D) return;
+    e.preventDefault(); move(t.clientX,t.clientY);
+  },{passive:false});
+  const end=cancel=>e=>{
+    if(pend){ clearTimeout(pend.timer); pend=null; return; }
+    if(!D) return;
+    const src=D.src; e.preventDefault();                     // don't let the finger-lift turn into a tap/click
+    finish(cancel); src.classList.remove('tlong');
+  };
+  document.addEventListener('touchend',end(false),{passive:false});
+  document.addEventListener('touchcancel',end(true),{passive:false});
+  // iOS long-press menu / magnifier on handles
+  document.addEventListener('contextmenu',e=>{ if(D || (e.target.closest && e.target.closest('.grip,.mcell-grip,.wgrip,.gcell'))) { if(isTouchUI()) e.preventDefault(); } });
+})();
+
 /* ============ meals + wishlist ============ */
 const mealsDaysEl=document.getElementById('mealsDays');
 function getMeal(day,slot){ return day.rows.find(r=>r.meal===slot); }
@@ -2343,7 +2462,6 @@ function renderMeals(){
       // drag only via grip; locked cells can't be dragged
       c.draggable=false;
       grip.addEventListener('mousedown',()=>{ if(!locked) c.draggable=true; });
-      grip.addEventListener('touchstart',()=>{ if(!locked) c.draggable=true; },{passive:true});
       c.addEventListener('dragstart',e=>{ if(locked){e.preventDefault();return;} mealDrag={type:'cell',di,slot}; e.dataTransfer.effectAllowed='move'; c.classList.add('mdragging'); });
       c.addEventListener('dragend',()=>{ c.draggable=false; c.classList.remove('mdragging'); document.querySelectorAll('.mcell.mover').forEach(x=>x.classList.remove('mover')); });
       // drop target (locked cells still receive? no — locked shouldn't be overwritten)
@@ -2394,7 +2512,7 @@ function renderWish(){
   state.wish.forEach((w,i)=>{
     const it=document.createElement('div');
     it.className='witem'+(w.done?' picked':'');
-    it.draggable=true;
+    it.draggable=!isTouchUI();
     it.addEventListener('dragstart',e=>{ mealDrag={type:'wish',i}; e.dataTransfer.effectAllowed='copy'; it.classList.add('mdragging'); });
     it.addEventListener('dragend',()=>it.classList.remove('mdragging'));
     const grip=document.createElement('span'); grip.className='wgrip'; grip.textContent='⠿';
